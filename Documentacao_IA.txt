@@ -1,0 +1,678 @@
+# CLAUDE.md — Documentação do Projeto para IA
+
+> Este arquivo é lido automaticamente pelo Claude Code antes de qualquer geração de código.
+> Siga TODAS as instruções deste documento sem exceção.
+> Em caso de conflito entre este arquivo e um prompt pontual, este arquivo tem precedência.
+
+---
+
+## 1. VISÃO GERAL DO PROJETO
+
+### O que é este sistema
+
+Sistema SaaS de gestão financeira especializado para **clínicas de psicologia** no Brasil.
+O produto resolve dores específicas do setor: controle de sessões recorrentes, repasse automático para psicólogos PJ, cobrança inteligente via WhatsApp com IA, e dashboards financeiros com KPIs do segmento.
+
+### Posicionamento de mercado
+
+- Nicho: clínicas de psicologia de pequeno e médio porte (1 a 20 psicólogos)
+- Diferenciais: automação N8N + IA integrada, bot de cobrança via WhatsApp, repasse automatizado
+- Concorrentes diretos: GestorPSI, PsicoManager, Sinappsy, Terapee, Clínica Ágil Psicologia
+- Diferença principal: nenhum concorrente tem automação de IA no nível que este sistema entrega
+
+### Personas do usuário
+
+| Persona | Papel | Necessidade principal |
+|---|---|---|
+| Gestor da clínica | Admin | Visão financeira consolidada, controle de repasses |
+| Psicóloga(o) PJ | Profissional | Ver suas sessões, receber extrato de repasse |
+| Secretária | Operacional | Registrar sessões, controlar presenças, cobranças |
+
+---
+
+## 2. STACK TECNOLÓGICA
+
+```
+Backend  : .NET Core 8  (C#)
+Frontend : Angular 18+  (TypeScript)
+Banco    : PostgreSQL 16
+Automação: N8N (processo externo, comunicação via webhook)
+ORM      : Entity Framework Core + Npgsql
+Auth     : JWT Bearer (tokens de acesso + refresh token)
+Jobs     : Hangfire (persistência no PostgreSQL)
+Cache    : IMemoryCache (MVP) → Redis (V2)
+Docs API : Swagger / OpenAPI 3.0
+Testes   : xUnit + FluentAssertions + Testcontainers
+```
+
+---
+
+## 3. ARQUITETURA — MODULAR MONOLITH
+
+### Decisão arquitetural
+
+Este projeto usa **Modular Monolith** — um único deploy com módulos internamente isolados.
+NÃO use microserviços. NÃO crie múltiplos projetos de API separados.
+A decisão foi consciente: time pequeno, MVP, validação de mercado.
+
+### Estrutura de pastas obrigatória
+
+```
+src/
+├── PsicoFinance.Api/                  # Entry point — Controllers, Middlewares, Program.cs
+├── PsicoFinance.Domain/               # Entidades, Value Objects, Eventos de Domínio, Interfaces
+├── PsicoFinance.Application/          # Use Cases, Commands, Queries, DTOs, Validators
+│   ├── Cadastros/
+│   ├── Sessoes/
+│   ├── Financeiro/
+│   ├── Dashboard/
+│   └── Notificacoes/
+├── PsicoFinance.Infrastructure/       # EF Core, Repositórios, Integrações externas, Hangfire
+└── PsicoFinance.Tests/                # xUnit — Unit + Integration tests
+
+frontend/
+└── src/
+    ├── app/
+    │   ├── core/                      # Guards, Interceptors, Services globais
+    │   ├── shared/                    # Componentes, pipes e diretivas reutilizáveis
+    │   └── modules/                   # Módulos de feature (lazy loaded)
+    │       ├── auth/
+    │       ├── cadastros/
+    │       ├── sessoes/
+    │       ├── financeiro/
+    │       ├── dashboard/
+    │       └── configuracoes/
+```
+
+### Fluxo de comunicação entre camadas
+
+```
+Request HTTP
+  → Controller (Api)
+    → Command/Query (Application)
+      → Use Case Handler (Application)
+        → Domain Entity / Service (Domain)
+          → Repository Interface (Domain)
+            → Repository Implementation (Infrastructure)
+              → PostgreSQL
+```
+
+Controllers nunca acessam repositórios diretamente.
+Domain nunca referencia Infrastructure.
+Application nunca referencia Api.
+
+### Multi-tenancy
+
+- Estratégia: **schema por tenant** no PostgreSQL
+- Cada clínica tem um schema isolado: `clinica_001`, `clinica_002`, etc.
+- O `TenantId` é extraído do JWT em cada request via middleware `TenantResolverMiddleware`
+- Nenhuma query pode ser escrita sem o filtro de tenant — o EF Core aplica via `HasQueryFilter` global
+- NUNCA escreva uma query sem `WHERE tenant_id = @tenantId` ou sem o query filter ativo
+
+---
+
+## 4. MÓDULOS DO SISTEMA
+
+### Módulo 1 — Cadastros
+
+Entidades: `Clinica`, `Psicologa`, `Paciente`, `Contrato`, `PlanoDeContas`
+
+Regras de negócio:
+- Uma `Clinica` pode ter N `Psicologas` e N `Pacientes`
+- Um `Paciente` pertence a uma clínica e é atendido por uma ou mais psicólogas
+- Cada `Psicologa` tem uma regra de repasse: percentual fixo OU valor por sessão
+- Um `Contrato` define: valor por sessão, frequência, data início, regra de cancelamento
+- Status de contrato: `Ativo`, `Pausado`, `Encerrado`
+- Não é possível excluir uma psicóloga com sessões futuras agendadas
+
+### Módulo 2 — Sessões
+
+Entidades: `Sessao`, `RecorrenciaSemanal`
+
+Regras de negócio:
+- Uma sessão pode ter status: `Agendada`, `Realizada`, `FaltouCobrar`, `FaltouNaoCobrar`, `Cancelada`
+- Ao criar uma `RecorrenciaSemanal`, o sistema gera sessões automaticamente para os próximos 90 dias
+- **Regra crítica:** ao mudar status de `Agendada` → `Realizada`, o sistema publica `SessaoRealizadaEvent`
+- **Regra crítica:** ao mudar status para `FaltouCobrar`, o sistema publica `SessaoFaltaCobrancaEvent`
+- **Regra crítica:** ao mudar status para `Cancelada`, o lançamento financeiro associado é estornado
+- Não é permitido alterar o status de uma sessão com data anterior a 30 dias sem permissão de Admin
+- Sessões `Agendadas` geram lançamentos financeiros como `Previsto` — não como `Realizado`
+
+### Módulo 3 — Financeiro
+
+Entidades: `LancamentoFinanceiro`, `ContaReceber`, `ContaPagar`, `Repasse`, `FechamentoMensal`
+
+Regras de negócio:
+- `LancamentoFinanceiro` tem tipo: `Receita` ou `Despesa`; e status: `Previsto`, `Realizado`, `Cancelado`
+- Lançamentos `Realizados` **não podem ser excluídos** — apenas estornados (cria lançamento inverso)
+- Todo lançamento deve ter: `valor`, `data`, `categoria` (do PlanoDeContas), `descricao`, `tenantId`
+- O `Repasse` é calculado no fechamento do mês com base nas sessões `Realizadas` do período
+- Fórmula de repasse: `valor_sessao × percentual_psicologa` ou `valor_fixo_por_sessao`
+- Um `FechamentoMensal` torna o mês imutável: nenhum lançamento pode ser criado/editado no período fechado
+- A geração de NFSe é feita via integração com API externa (NFSe.io ou similar) — não implemente lógica fiscal interna
+
+### Módulo 4 — Automações (N8N)
+
+O sistema não executa automações internamente. Ele **dispara webhooks** para o N8N.
+
+Webhooks que o backend deve disparar:
+
+| Evento | Endpoint N8N | Payload mínimo |
+|---|---|---|
+| Sessão não paga há X dias | `POST /webhook/sessao-inadimplente` | `{ sessaoId, pacienteNome, telefone, valor, diasAtraso }` |
+| Sessão agendada para amanhã | `POST /webhook/confirmar-sessao` | `{ sessaoId, pacienteNome, telefone, data, hora, psicologaNome }` |
+| Fechamento do mês gerado | `POST /webhook/repasse-mensal` | `{ psicologaId, competencia, valor, sessoes[] }` |
+| Novo paciente cadastrado | `POST /webhook/novo-paciente` | `{ pacienteId, nome, telefone, clinicaNome }` |
+
+O N8N pode chamar de volta o backend via `POST /api/internal/webhook/callback` para registrar resultados de automações (ex: acordo de parcelamento negociado pelo bot).
+
+Todos os webhooks saem de forma **assíncrona via Hangfire** — nunca de forma síncrona no fluxo da request.
+
+### Módulo 5 — Dashboard
+
+KPIs obrigatórios:
+- `faturamento_realizado_mes`: soma de lançamentos Realizados do mês corrente
+- `faturamento_previsto_mes`: soma de lançamentos Previstos do mês corrente
+- `taxa_inadimplencia`: (sessões FaltouCobrar não pagas / total sessões realizadas) × 100
+- `taxa_absenteismo_por_psicologa`: (faltas / total agendadas) por psicóloga no período
+- `ticket_medio_paciente`: receita total / pacientes ativos no período
+- `projecao_receita_proximos_30_dias`: baseado em sessões agendadas × valor por sessão
+
+---
+
+## 5. REGRAS DE SEGURANÇA
+
+### Autenticação e Autorização
+
+- JWT com expiração de **15 minutos** para access token
+- Refresh token com expiração de **7 dias**, armazenado em `HttpOnly Cookie`
+- NUNCA retorne o refresh token no body da resposta JSON
+- Implemente `[Authorize]` em todos os controllers — nenhum endpoint é público por padrão
+- Endpoints públicos devem ser explicitamente marcados com `[AllowAnonymous]`
+- Perfis de acesso: `Admin`, `Psicologa`, `Secretaria`, `ReadOnly`
+- Implemente verificação de perfil via Policy, não via roles inline no código
+
+### Isolamento de dados (CRÍTICO)
+
+- **NUNCA** retorne dados de outro tenant, mesmo que o usuário seja Admin global
+- Toda query deve ser filtrada por `TenantId` — use `HasQueryFilter` no EF Core como primeira linha de defesa
+- Adicione verificação explícita de tenant em casos críticos (ex: buscar sessão por ID)
+- Se um recurso não pertence ao tenant do usuário logado, retorne `404 Not Found` — NUNCA `403 Forbidden` (não confirme que o recurso existe)
+
+### Dados sensíveis
+
+- Dados de pacientes são **dados de saúde** — tratamento especial pela LGPD
+- Nome, CPF, telefone e histórico de sessões devem ser **criptografados em repouso** (AES-256)
+- Logs de aplicação **NUNCA** devem conter: nome de paciente, CPF, telefone, valor de sessão
+- Logs podem conter apenas: IDs, timestamps, status codes, módulo, ação
+- Implemente mascaramento automático de dados sensíveis no Serilog via `Destructurama`
+- Campos sensíveis no banco: `nome_paciente`, `cpf`, `telefone`, `email`
+
+### Auditoria
+
+- Toda alteração em `LancamentoFinanceiro` deve gerar registro em tabela `audit_log`
+- Campos obrigatórios no audit_log: `tabela`, `operacao` (INSERT/UPDATE/DELETE), `usuario_id`, `tenant_id`, `data_hora`, `valor_anterior_json`, `valor_novo_json`
+- Implemente via interceptor do EF Core — não via triggers no banco
+- Registros de audit_log são imutáveis — nenhuma rota de exclusão deve existir
+
+### API
+
+- Rate limiting: 100 requests/minuto por IP em endpoints públicos; 300/minuto para autenticados
+- Valide e sanitize TODOS os inputs — use FluentValidation em todos os Commands/Queries
+- Retorne sempre `application/json` — nunca exponha stack traces em produção
+- Use `ProblemDetails` (RFC 7807) para todas as respostas de erro
+- CORS: restrinja às origens conhecidas — nunca use `AllowAnyOrigin()` em produção
+- Headers de segurança obrigatórios: `X-Content-Type-Options`, `X-Frame-Options`, `Strict-Transport-Security`
+
+---
+
+## 6. REGRAS DE CÓDIGO — CLEAN CODE
+
+### Nomenclatura
+
+```csharp
+// Classes: PascalCase, substantivos
+public class LancamentoFinanceiro { }
+public class SessaoRealizadaEventHandler { }
+
+// Métodos: PascalCase, verbos
+public async Task<Result<SessaoDto>> RegistrarPresencaAsync(RegistrarPresencaCommand command) { }
+
+// Variáveis e parâmetros: camelCase
+var lancamentoFinanceiro = await _repository.GetByIdAsync(id);
+
+// Constantes: UPPER_SNAKE_CASE
+public const int DIAS_PARA_ALERTA_INADIMPLENCIA = 3;
+
+// Interfaces: prefixo I
+public interface ILancamentoFinanceiroRepository { }
+
+// Async: sempre sufixo Async
+public async Task ProcessarRepasseAsync() { }
+```
+
+### Regras de tamanho e complexidade
+
+- Métodos: **máximo 20 linhas**. Se passou, extraia método privado com nome descritivo
+- Classes: **máximo 200 linhas**. Se passou, avalie se a classe tem mais de uma responsabilidade
+- Complexidade ciclomática: **máximo 5** por método. Sem if-else aninhados profundos
+- Parâmetros por método: **máximo 3**. Se precisar de mais, use um objeto Command/Request
+- Evite comentários que explicam O QUÊ o código faz — o código deve ser autoexplicativo
+- Use comentários apenas para explicar o PORQUÊ de decisões não óbvias
+
+### Proibições absolutas
+
+```csharp
+// PROIBIDO: magic numbers e strings
+if (diasAtraso > 3) { }  // ERRADO
+if (diasAtraso > DIAS_PARA_ALERTA_INADIMPLENCIA) { }  // CORRETO
+
+// PROIBIDO: exceções genéricas
+throw new Exception("Erro ao salvar");  // ERRADO
+throw new DomainException("Sessao nao pode ser cancelada apos fechamento mensal");  // CORRETO
+
+// PROIBIDO: retorno nulo — use Result<T> ou Option<T>
+public Sessao GetById(Guid id) { return null; }  // ERRADO
+public Result<Sessao> GetById(Guid id) { return Result.Failure<Sessao>("Sessao nao encontrada"); }  // CORRETO
+
+// PROIBIDO: lógica de negócio em Controller
+[HttpPost]
+public async Task<IActionResult> RegistrarPresenca([FromBody] RegistrarPresencaRequest request)
+{
+    var sessao = await _context.Sessoes.FindAsync(request.SessaoId);
+    sessao.Status = "Realizada";  // ERRADO — lógica no controller
+    await _context.SaveChangesAsync();
+}
+
+// PROIBIDO: acesso direto ao DbContext fora da Infrastructure
+// Controllers e Application nunca referenciam DbContext
+
+// PROIBIDO: strings de conexão hardcoded
+var conn = "Host=localhost;Database=psico";  // ERRADO — use IConfiguration/secrets
+
+// PROIBIDO: async void (exceto event handlers de UI)
+public async void ProcessarAsync() { }  // ERRADO
+public async Task ProcessarAsync() { }  // CORRETO
+```
+
+### Tratamento de erros
+
+- Use o padrão `Result<T>` para operações de domínio que podem falhar de forma esperada
+- Use exceções apenas para condições verdadeiramente excepcionais (infraestrutura, bugs)
+- Implemente `GlobalExceptionHandlerMiddleware` que converte exceções não tratadas em `ProblemDetails`
+- Nunca faça swallow de exceções — se capturou, logou e relançou ou tratou com intenção
+
+---
+
+## 7. PRINCÍPIOS SOLID — APLICAÇÃO PRÁTICA
+
+### S — Single Responsibility
+
+Cada classe tem **uma única razão para mudar**.
+
+```csharp
+// ERRADO: RegistrarSessaoService faz tudo
+public class RegistrarSessaoService
+{
+    public async Task RegistrarAsync(...)
+    {
+        // valida dados
+        // persiste sessão
+        // calcula lançamento financeiro
+        // envia webhook para N8N
+        // envia email de confirmação
+    }
+}
+
+// CORRETO: cada responsabilidade em seu lugar
+public class RegistrarSessaoCommandHandler  // orquestra
+public class SessaoDomainService            // regras de domínio
+public class LancamentoFinanceiroService    // lógica financeira
+public class WebhookDispatchService         // disparo de eventos externos
+```
+
+### O — Open/Closed
+
+Aberto para extensão, fechado para modificação.
+
+```csharp
+// Use Strategy para regras de repasse — novas regras não modificam código existente
+public interface IRepasseStrategy
+{
+    decimal Calcular(decimal valorSessao, Psicologa psicologa);
+}
+
+public class RepassePercentualStrategy : IRepasseStrategy { }
+public class RepasseValorFixoStrategy : IRepasseStrategy { }
+// Amanhã: RepasseEscalonado — novo arquivo, zero mudanças nas classes existentes
+```
+
+### L — Liskov Substitution
+
+Subtipos devem ser substituíveis por seus tipos base sem quebrar o comportamento.
+
+- Não quebre contratos de interfaces em implementações
+- Se uma implementação não consegue honrar todos os métodos da interface, a interface está errada
+
+### I — Interface Segregation
+
+Interfaces pequenas e coesas — não force classes a implementar o que não usam.
+
+```csharp
+// ERRADO: interface gorda
+public interface IRepository<T>
+{
+    Task<T> GetByIdAsync(Guid id);
+    Task<IEnumerable<T>> GetAllAsync();
+    Task AddAsync(T entity);
+    Task UpdateAsync(T entity);
+    Task DeleteAsync(Guid id);
+    Task<IEnumerable<T>> SearchAsync(string query);
+    Task<int> CountAsync();
+    Task BulkInsertAsync(IEnumerable<T> entities);
+}
+
+// CORRETO: interfaces por capacidade
+public interface IReadRepository<T> { Task<T> GetByIdAsync(Guid id); }
+public interface IWriteRepository<T> { Task AddAsync(T entity); Task UpdateAsync(T entity); }
+```
+
+### D — Dependency Inversion
+
+Dependa de abstrações, não de implementações concretas.
+
+```csharp
+// ERRADO: dependência direta de implementação
+public class RegistrarSessaoHandler
+{
+    private readonly SessaoRepository _repository = new SessaoRepository();  // ERRADO
+}
+
+// CORRETO: injeção via interface
+public class RegistrarSessaoHandler
+{
+    private readonly ISessaoRepository _repository;
+    public RegistrarSessaoHandler(ISessaoRepository repository)
+    {
+        _repository = repository;
+    }
+}
+```
+
+Registre todas as dependências no `Program.cs` via `IServiceCollection`.
+Use `AddScoped` para repositórios e handlers.
+Use `AddSingleton` apenas para serviços sem estado.
+Use `AddTransient` para validators e factories.
+
+---
+
+## 8. PADRÕES OBRIGATÓRIOS
+
+### CQRS com MediatR
+
+Todo caso de uso é um `Command` (escrita) ou `Query` (leitura) — nunca misture os dois.
+
+```csharp
+// Escrita
+public record RegistrarPresencaCommand(Guid SessaoId, DateTime DataRealizacao) : IRequest<Result<SessaoDto>>;
+public class RegistrarPresencaCommandHandler : IRequestHandler<RegistrarPresencaCommand, Result<SessaoDto>> { }
+
+// Leitura
+public record ObterFluxoCaixaQuery(Guid TenantId, DateOnly Inicio, DateOnly Fim) : IRequest<Result<FluxoCaixaDto>>;
+public class ObterFluxoCaixaQueryHandler : IRequestHandler<ObterFluxoCaixaQuery, Result<FluxoCaixaDto>> { }
+```
+
+### Validação com FluentValidation
+
+Todo Command e Query deve ter um Validator correspondente.
+
+```csharp
+public class RegistrarPresencaCommandValidator : AbstractValidator<RegistrarPresencaCommand>
+{
+    public RegistrarPresencaCommandValidator()
+    {
+        RuleFor(x => x.SessaoId).NotEmpty().WithMessage("SessaoId e obrigatorio");
+        RuleFor(x => x.DataRealizacao).LessThanOrEqualTo(DateTime.UtcNow)
+            .WithMessage("Data de realizacao nao pode ser futura");
+    }
+}
+```
+
+Registre os validators via `AddValidatorsFromAssembly` e use o `ValidationBehavior` do MediatR Pipeline.
+
+### Domain Events
+
+Eventos de domínio são disparados dentro das entidades e processados por handlers.
+
+```csharp
+public class Sessao : BaseEntity
+{
+    public void Realizar(DateTime dataRealizacao)
+    {
+        if (Status != StatusSessao.Agendada)
+            throw new DomainException("Apenas sessoes agendadas podem ser realizadas");
+
+        Status = StatusSessao.Realizada;
+        DataRealizacao = dataRealizacao;
+
+        AddDomainEvent(new SessaoRealizadaEvent(Id, PacienteId, PsicologaId, ValorSessao, dataRealizacao));
+    }
+}
+```
+
+### Respostas da API
+
+Use sempre o padrão consistente:
+
+```json
+// Sucesso com dados
+{ "data": { ... }, "success": true }
+
+// Sucesso sem dados (DELETE, por exemplo)
+{ "success": true }
+
+// Erro de validação (400)
+{
+  "type": "https://tools.ietf.org/html/rfc7807",
+  "title": "Validation Error",
+  "status": 400,
+  "errors": { "campo": ["mensagem de erro"] }
+}
+
+// Erro de domínio (422)
+{
+  "type": "https://psico-finance.com/errors/domain-error",
+  "title": "Regra de negocio violada",
+  "status": 422,
+  "detail": "Sessao nao pode ser cancelada apos fechamento mensal"
+}
+```
+
+---
+
+## 9. BANCO DE DADOS
+
+### Convenções
+
+- Nomes de tabelas: `snake_case`, plural: `sessoes`, `lancamentos_financeiros`
+- Nomes de colunas: `snake_case`: `data_realizacao`, `valor_sessao`, `tenant_id`
+- Toda tabela deve ter: `id UUID PRIMARY KEY DEFAULT gen_random_uuid()`, `criado_em TIMESTAMPTZ DEFAULT NOW()`, `atualizado_em TIMESTAMPTZ`
+- Use `TIMESTAMPTZ` (com timezone) — nunca `TIMESTAMP` sem timezone
+- Soft delete: coluna `excluido_em TIMESTAMPTZ NULL` — nunca delete físico de entidades de negócio
+
+### Migrations
+
+- Migrations geradas pelo EF Core via `dotnet ef migrations add`
+- NUNCA edite uma migration já aplicada em produção — crie uma nova
+- Toda migration deve ter rollback testado (`dotnet ef database update <migration-anterior>`)
+- Dados de seed em migrations separadas — nunca misture schema e dados
+
+### Índices obrigatórios
+
+```sql
+-- Todo tenant_id em toda tabela
+CREATE INDEX idx_sessoes_tenant_id ON sessoes(tenant_id);
+
+-- Busca por data é frequente
+CREATE INDEX idx_sessoes_data ON sessoes(data_sessao);
+CREATE INDEX idx_lancamentos_data ON lancamentos_financeiros(data_lancamento);
+
+-- Lookup de status é frequente
+CREATE INDEX idx_sessoes_status ON sessoes(status);
+CREATE INDEX idx_lancamentos_status ON lancamentos_financeiros(status);
+```
+
+---
+
+## 10. TESTES
+
+### Estrutura obrigatória
+
+```
+PsicoFinance.Tests/
+├── Unit/
+│   ├── Domain/          # Testa entidades e regras de domínio — sem I/O
+│   └── Application/     # Testa handlers com mocks dos repositórios
+└── Integration/
+    └── Api/             # Testa endpoints HTTP com banco real (Testcontainers)
+```
+
+### Regras para testes
+
+- Todo método público de Domain Entity deve ter teste unitário
+- Todo `CommandHandler` e `QueryHandler` deve ter pelo menos 2 testes: caminho feliz + erro esperado
+- Testes de integração usam `Testcontainers` para PostgreSQL — nunca banco compartilhado
+- Use `builder pattern` para construção de objetos de teste — nunca `new Entidade()` espalhado
+- Nomes dos testes seguem o padrão: `Metodo_Cenario_ResultadoEsperado`
+
+```csharp
+[Fact]
+public void Realizar_QuandoSessaoJaFoiRealizada_DeveLancarDomainException()
+{
+    // Arrange
+    var sessao = SessaoBuilder.Criar().ComStatus(StatusSessao.Realizada).Build();
+
+    // Act
+    var act = () => sessao.Realizar(DateTime.UtcNow);
+
+    // Assert
+    act.Should().Throw<DomainException>()
+       .WithMessage("*apenas sessoes agendadas*");
+}
+```
+
+### Cobertura mínima
+
+- Domain: **90%** de cobertura
+- Application: **80%** de cobertura
+- Infrastructure: **60%** de cobertura (integrações são mais caras de testar)
+
+---
+
+## 11. ANGULAR — FRONTEND
+
+### Estrutura de módulos
+
+- Todos os módulos de feature são **lazy loaded** via `loadComponent` ou `loadChildren`
+- Use **Signals** para estado local de componentes (Angular 17+) — não use `BehaviorSubject` para estado simples
+- Use `NgRx Signal Store` para estado global compartilhado entre componentes
+- Toda chamada HTTP passa pelo `ApiService` centralizado — nunca injetar `HttpClient` diretamente em componentes
+
+### Convenções Angular
+
+```typescript
+// Componentes: sufixo Component, OnPush por padrão
+@Component({
+  selector: 'app-sessao-lista',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class SessaoListaComponent { }
+
+// Services: sufixo Service
+export class SessaoService { }
+
+// Interfaces/Types: prefixo I ou sufixo Dto
+export interface ISessao { }
+export type SessaoDto = { ... }
+
+// Signals para estado local
+readonly sessoes = signal<SessaoDto[]>([]);
+readonly isLoading = signal(false);
+readonly sessoesFiltradas = computed(() =>
+  this.sessoes().filter(s => s.status === this.filtroAtivo())
+);
+```
+
+### Segurança no frontend
+
+- Tokens JWT armazenados em **memória** (`signal` ou variável de serviço) — nunca em `localStorage`
+- Refresh token gerenciado via `HttpOnly Cookie` — o Angular não acessa, apenas o browser envia automaticamente
+- Implemente `AuthInterceptor` que adiciona `Authorization: Bearer <token>` automaticamente
+- Implemente `TenantInterceptor` que adiciona `X-Tenant-Id` em todas as requests
+- Rotas protegidas via `AuthGuard` com verificação de perfil
+
+---
+
+## 12. CONTEXTO ADICIONAL PARA IA
+
+### O que este sistema NÃO é
+
+- Não é um prontuário eletrônico — não existe campo de evolução clínica, diagnóstico ou CID
+- Não é um sistema de agendamento público para pacientes — é gestão interna da clínica
+- Não tem telemedicina, videochamada ou qualquer funcionalidade clínica
+- Não faz faturamento TISS (planos de saúde) — isso é V2
+
+### Termos do domínio — use sempre estes nomes
+
+| Termo técnico | Termo do domínio |
+|---|---|
+| `User` | `Usuario` |
+| `Professional` | `Psicologa` (aceita psicólogo também — use genérico no código: `profissional`) |
+| `Patient` | `Paciente` |
+| `Appointment` | `Sessao` |
+| `Recurrence` | `RecorrenciaSemanal` |
+| `FinancialEntry` | `LancamentoFinanceiro` |
+| `Transfer` | `Repasse` |
+| `MonthlyClosing` | `FechamentoMensal` |
+| `Tenant` | `Clinica` (no contexto de multi-tenancy) |
+
+### Decisões já tomadas — não questione, implemente
+
+1. Multi-tenancy por schema — não por coluna tenant_id na mesma tabela
+2. Modular Monolith — não microserviços
+3. N8N externo via webhook — não automações internas
+4. CQRS com MediatR — não service layer tradicional
+5. Result<T> para erros de domínio — não exceções para fluxo de negócio
+6. Hangfire para jobs — não hosted services personalizados
+7. FluentValidation — não Data Annotations para validação de negócio
+
+### Como responder a pedidos de código
+
+Ao gerar código para este projeto:
+
+1. **Sempre siga a estrutura de pastas** definida na seção 3
+2. **Sempre aplique o módulo correto** — não coloque lógica de Sessões no módulo Financeiro
+3. **Sempre inclua o namespace correto** baseado na estrutura de pastas
+4. **Sempre crie o arquivo de teste correspondente** quando gerar um Handler, Service ou Entity
+5. **Sempre use os termos do domínio** da tabela acima — nunca traduza para inglês puro
+6. **Nunca gere código com TODO ou placeholder** — se não souber como implementar algo, pergunte
+7. **Sempre aplique as regras de segurança** da seção 5 — especialmente isolamento de tenant
+8. **Sempre valide inputs** com FluentValidation antes de qualquer lógica de negócio
+
+### Prioridades de desenvolvimento (ordem)
+
+```
+1. Módulo de Cadastros (Clinica, Psicologa, Paciente)
+2. Autenticação e multi-tenancy
+3. Módulo de Sessões (recorrência + status)
+4. Módulo Financeiro (lançamentos + repasse)
+5. Webhooks para N8N
+6. Dashboard e KPIs
+7. Emissão de Recibo / NFSe
+```
+
+---
+
+*Última atualização: Março 2026*
+*Versão do documento: 1.0*
+*Arquitetura: Modular Monolith | Stack: .NET Core 8 + Angular 18 + PostgreSQL 16 + N8N*

@@ -1,0 +1,11 @@
+Requisitos Não Funcionais — como o sistema deve se comportarRNF01 — Conformidade com LGPD
+Todos os dados de pacientes devem ser criptografados em repouso e em trânsito. O sistema deve permitir exclusão e portabilidade de dados mediante solicitação, seguindo o padrão exigido pelo CFP para dados de saúde mental.RNF02 — Disponibilidade 99,5%
+O sistema deve estar disponível pelo menos 99,5% do tempo mensal, com janelas de manutenção programadas fora do horário comercial e notificação prévia aos usuários.RNF03 — Tempo de Resposta
+Qualquer tela do sistema deve carregar em menos de 2 segundos em conexão padrão (10 Mbps). Relatórios pesados devem ser gerados em background com notificação ao usuário.RNF04 — Multi-dispositivo e Responsivo
+Interface totalmente responsiva, operável em desktop, tablet e celular, sem necessidade de app nativo. A secretária precisa usar no computador; o psicólogo precisa conferir no celular entre sessões.RNF05 — Isolamento de Dados por Clínica (Multi-tenant)
+Cada clínica deve ter seus dados completamente isolados das demais. Nenhum dado de um cliente deve ser acessível por outro, mesmo que compartilhem a mesma infraestrutura.RNF06 — Rastreabilidade e Auditoria
+Toda alteração financeira (edição de lançamento, exclusão, reprocessamento de repasse) deve ser registrada em log com usuário, data/hora e valor anterior, para fins de auditoria interna.RNF07 — Escalabilidade Horizontal
+A arquitetura deve suportar crescimento de base de clientes sem redesenho estrutural — novas instâncias devem poder ser adicionadas sem downtime.RNF08 — Integração via API/Webhook
+O sistema deve expor webhooks para integração com ferramentas externas (N8N, Zapier, sistemas de agendamento parceiros), permitindo que automações externas disparem ações internas.RNF09 — Backup Automático Diário
+Backup completo dos dados realizado diariamente com retenção mínima de 90 dias, armazenado em região geográfica diferente do servidor principal.RNF10 — Onboarding Guiado em menos de 30 minutos
+Um novo usuário deve conseguir cadastrar a clínica, um psicólogo e o primeiro paciente em menos de 30 minutos sem suporte humano, com checklist de setup e tooltips contextuais.

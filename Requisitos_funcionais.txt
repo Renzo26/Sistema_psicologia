@@ -1,0 +1,11 @@
+Requisitos Funcionais — o que o sistema deve fazerRF01 — Gestão de Sessões Recorrentes
+O sistema deve permitir cadastrar sessões fixas por paciente (dia, horário, frequência semanal/quinzenal), gerando automaticamente os lançamentos financeiros futuros com base nessa recorrência.RF02 — Controle de Presenças e Faltas
+Registrar se cada sessão foi realizada, faltada ou cancelada, com distinção de falta justificada versus não justificada, impactando diretamente o financeiro (cobrar ou não cobrar).RF03 — Cobrança Automática via WhatsApp
+Disparar mensagens automáticas de cobrança via WhatsApp quando uma sessão não foi paga no prazo, com fluxo de negociação via bot de IA sem intervenção humana.RF04 — Repasse para Psicólogos PJ
+Calcular automaticamente o valor a repassar para cada psicólogo autônomo que atua na clínica, com base nas sessões realizadas e na regra de divisão cadastrada (percentual ou valor fixo).RF05 — Fluxo de Caixa em Tempo Real
+Exibir entradas, saídas e saldo projetado por dia, semana e mês, separando receitas confirmadas de receitas previstas (sessões agendadas mas não realizadas).RF06 — Dashboard Gerencial com KPIs
+Painel com indicadores: taxa de absenteísmo por psicólogo, inadimplência percentual, ticket médio por paciente, faturamento realizado vs. projetado e número de sessões ativas.RF07 — Alertas Proativos para o Gestor
+Enviar resumo diário automático por WhatsApp ao gestor com: caixa do dia, sessões do dia, cobranças pendentes e eventuais alertas de atenção.RF08 — Cadastro de Pacientes e Contratos
+Registrar dados do paciente, valor combinado por sessão, forma de pagamento preferida e status do contrato terapêutico (ativo, pausado, encerrado).RF09 — Emissão de Recibo e NFSe
+Gerar recibo em PDF por sessão ou por período e emitir NFSe integrada para clínicas que precisam faturar pessoa jurídica ou plano de saúde.RF10 — Relatório de Repasse e Fechamento Mensal
+Gerar relatório mensal consolidado por psicólogo com todas as sessões, valores e o montante a repassar, enviável automaticamente por WhatsApp ou e-mail no fechamento do mês.
