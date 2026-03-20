@@ -1,0 +1,599 @@
+================================================================================
+  PSICOFINANCE — GUIA DE DESIGN DO FRONTEND
+  CloudySolutions · Versão 1.0 · Março 2026
+================================================================================
+
+Este documento define as regras visuais e de comportamento do frontend do
+PsicoFinance. Todo desenvolvedor e designer deve seguir estas diretrizes antes
+de criar qualquer tela, componente ou elemento de interface.
+
+--------------------------------------------------------------------------------
+  1. FILOSOFIA DE DESIGN
+--------------------------------------------------------------------------------
+
+O PsicoFinance segue o estilo "Clean Financial Dashboard" — inspirado no Fundcy
+(referência visual aprovada). As características centrais desse estilo são:
+
+  · Cards com bordas muito arredondadas (18px a 24px de border-radius)
+  · Fundo da página levemente colorido — NÃO branco puro
+  · Números financeiros grandes, bold e com destaque tipográfico
+  · Zero sombras exageradas — profundidade feita com cor de fundo + borda
+  · Sidebar branca e limpa, sem cor de fundo escura
+  · Espaçamento generoso entre elementos (breathing room)
+  · Hierarquia visual clara: dado > label > ação
+
+A interface deve transmitir CONFIANÇA e CLAREZA. O usuário (gestor da clínica)
+precisa entender a saúde financeira da clínica em menos de 5 segundos ao abrir
+o dashboard. Nenhum elemento decorativo deve competir com os dados.
+
+--------------------------------------------------------------------------------
+  2. FUNDO DA PÁGINA — REGRA DO TOM PASTEL
+--------------------------------------------------------------------------------
+
+O fundo da página (body background) NUNCA deve ser branco puro (#FFFFFF).
+Branco puro cansa a visão em uso prolongado e não cria a sensação de
+profundidade que diferencia os cards do fundo.
+
+  REGRA: O fundo deve ser um tom pastel muito suave, quase imperceptível,
+  que cria contraste suficiente para os cards brancos "flutuarem" visualmente.
+
+  Tema Claro (padrão):
+    Background da página:  #EFF1F5   ← azul-cinza pastel suave
+    Surface dos cards:     #FFFFFF   ← branco puro apenas nos cards
+    Surface secundária:    #F7F9FC   ← para inputs, hover states, rows
+
+  O valor #EFF1F5 foi escolhido por ser neutro-frio, que complementa tanto
+  o azul primário quanto o verde-sage sem criar tensão de cor.
+
+  IMPORTANTE: O contraste entre fundo (#EFF1F5) e card (#FFFFFF) deve ser
+  sutil — o olho percebe a separação, mas não de forma agressiva.
+  Nunca use um fundo mais escuro que #E8EAEF no tema claro.
+
+--------------------------------------------------------------------------------
+  3. PALETA DE CORES PRINCIPAL
+--------------------------------------------------------------------------------
+
+  A paleta foi definida com base na psicologia das cores aplicada à saúde
+  mental. Três famílias de cor formam o sistema, mais os neutros e semânticas.
+
+  ── 3.1 COR PRIMÁRIA — AZUL-PSICOLOGIA ──────────────────────────────────────
+
+  Esta é a cor escolhida conforme marcação na referência visual aprovada.
+  Corresponde aos swatches "Primário principal" (#4A86C8) e
+  "Texto em destaque" (#1A4478) da paleta.
+
+    --color-primary-50:   #EBF4FF   Fundo sutil, hover states, badges
+    --color-primary-100:  #C8DEFA   Fills claros, mini charts
+    --color-primary-300:  #4A86C8   COR PRINCIPAL — botões, links, ativo ★
+    --color-primary-400:  #3876BA   Hover do botão primário
+    --color-primary-500:  #2D6BA8   Pressed, bordas de destaque
+    --color-primary-700:  #1F4F80   Texto em fundo claro
+    --color-primary-800:  #1A4478   TEXTO EM DESTAQUE ★ — títulos, ícones
+    --color-primary-900:  #122E50   Texto muito escuro, dark mode
+
+  ★ As duas cores marcadas na imagem de referência são a #4A86C8 (ação) e
+    a #1A4478 (autoridade/texto). Estas são as âncoras da identidade visual.
+
+  ── 3.2 COR SECUNDÁRIA — VERDE-SAGE ─────────────────────────────────────────
+
+    --color-sage-50:    #EBF5F0   Background de sucesso, badges positivos
+    --color-sage-100:   #B8E4CE   Fills claros
+    --color-sage-300:   #4CAF82   Status positivo, confirmado
+    --color-sage-400:   #2E9A68   Sessão realizada, pago
+    --color-sage-500:   #248055   Verde escuro, texto em fundo sage
+    --color-sage-700:   #196040   Texto verde escuro
+    --color-sage-800:   #104030   Máximo escuro
+
+  Uso: exclusivamente para RESULTADOS POSITIVOS — sessão realizada, pago,
+  meta atingida, repasse concluído. Nunca use verde para elementos neutros.
+
+  ── 3.3 COR DE ACENTO — LAVANDA ─────────────────────────────────────────────
+
+    --color-lavender-50:   #F2EFFE   Background suave
+    --color-lavender-300:  #8B72D4   Tags, badges especiais, faltou (sem cobrar)
+    --color-lavender-500:  #6650B0   Acento em UI
+    --color-lavender-800:  #3D2A8A   Texto em fundo lavanda
+
+  Uso: para estados neutros-especiais como "faltou sem cobrar", tags de
+  categoria, elementos de destaque que não são nem positivos nem negativos.
+
+  ── 3.4 NEUTROS ──────────────────────────────────────────────────────────────
+
+    --color-bg:          #EFF1F5   Fundo da página (pastel suave)
+    --color-surface:     #FFFFFF   Cards, modais, inputs
+    --color-surface-2:   #F7F9FC   Hover rows, surface secundária
+    --color-border:      #E2E5EC   Divisores, bordas de input
+    --color-border-2:    #CDD2DC   Bordas com mais ênfase
+    --color-text:        #111827   Texto principal
+    --color-muted:       #6B7585   Texto secundário, labels
+    --color-hint:        #9BAAB8   Placeholders, hints, texto terciário
+
+  ── 3.5 SEMÂNTICAS DE STATUS ─────────────────────────────────────────────────
+
+    Atenção / Inadimplência:   #F59E0B  (fundo: #FFF8E6)
+    Erro / Crítico / Falta:    #E53935  (fundo: #FFF0F0)
+    Sucesso / Realizado:       #2E8A60  (fundo: #EBF5F0)
+    Informação / Agendado:     #4A86C8  (fundo: #EBF4FF)
+    Cancelado / Inativo:       #9BAAB8  (fundo: #F7F9FC)
+    Faltou sem cobrar:         #8B72D4  (fundo: #F2EFFE)
+
+--------------------------------------------------------------------------------
+  4. SISTEMA DE TEMAS — CLARO, ESCURO E VARIAÇÕES DE COR
+--------------------------------------------------------------------------------
+
+  O sistema deve suportar troca de tema em tempo real, sem reload de página.
+  A troca é feita via CSS custom properties no elemento :root ou [data-theme].
+  O Angular deve gerenciar o tema via ThemeService que aplica o atributo
+  data-theme no elemento <html>.
+
+  ── 4.1 TEMA CLARO (DEFAULT) ─────────────────────────────────────────────────
+
+  [data-theme="light"] {
+    --bg:            #EFF1F5;
+    --surface:       #FFFFFF;
+    --surface-2:     #F7F9FC;
+    --border:        #E2E5EC;
+    --text:          #111827;
+    --text-muted:    #6B7585;
+    --text-hint:     #9BAAB8;
+    --primary:       #4A86C8;
+    --primary-dark:  #1A4478;
+  }
+
+  ── 4.2 TEMA ESCURO ──────────────────────────────────────────────────────────
+
+  O tema escuro NÃO é simplesmente inverter as cores. Ele tem uma paleta
+  própria que mantém a identidade azul-psicologia.
+
+  [data-theme="dark"] {
+    --bg:            #0F1923;   ← azul-escuro profundo, não preto puro
+    --surface:       #1A2535;   ← cards levemente mais claros que o fundo
+    --surface-2:     #212F42;   ← hover, rows alternadas
+    --border:        #2A3A50;   ← bordas discretas
+    --text:          #E8EDF4;   ← branco levemente frio
+    --text-muted:    #7A8FA6;   ← muted mais escuro
+    --text-hint:     #4A6075;   ← hints bem sutis
+    --primary:       #5B9AD8;   ← azul um pouco mais claro para contraste
+    --primary-dark:  #93BBE8;   ← texto azul no dark mode
+    --sage:          #3BAF78;   ← verde levemente mais saturado
+    --lavender:      #9B84E0;   ← lavanda mais luminosa
+  }
+
+  O fundo #0F1923 foi escolhido por ser um azul-noite, coerente com a
+  identidade azul do produto. NUNCA use #000000 ou #111111 puro — sem
+  identidade de cor no dark mode o produto parece genérico.
+
+  ── 4.3 VARIAÇÕES DE COR (COLOR THEMES) ─────────────────────────────────────
+
+  Além do tema claro/escuro, o sistema deve suportar variações de cor de
+  acento. Isso permite que clínicas personalizem a cor principal do sistema.
+  Cada variação mantém as semânticas (verde=sucesso, vermelho=erro) mas
+  troca a cor primária de ação.
+
+  VARIAÇÃO 1 — Azul-Psicologia (padrão)
+    --primary:        #4A86C8
+    --primary-dark:   #1A4478
+    --primary-50:     #EBF4FF
+    Nome exibido: "Azul Clínica"
+
+  VARIAÇÃO 2 — Teal-Saúde
+    --primary:        #0F9B8E
+    --primary-dark:   #076B62
+    --primary-50:     #E6F7F5
+    Nome exibido: "Teal Saúde"
+    Quando usar: clínicas com identidade visual verde/teal já estabelecida
+
+  VARIAÇÃO 3 — Violeta-Bem-estar
+    --primary:        #7C5CBF
+    --primary-dark:   #4A3480
+    --primary-50:     #F0EAFE
+    Nome exibido: "Violeta Bem-estar"
+    Quando usar: clínicas com marca roxa (comum em psicologia analítica)
+
+  VARIAÇÃO 4 — Cinza-Slate (neutro premium)
+    --primary:        #4A5568
+    --primary-dark:   #1A202C
+    --primary-50:     #F7F8FA
+    Nome exibido: "Slate Premium"
+    Quando usar: clínicas que querem interface ultra-sóbria, corporativa
+
+  IMPLEMENTAÇÃO: O ThemeService deve salvar a preferência em localStorage
+  com as chaves "psico-theme" (light/dark) e "psico-color" (1/2/3/4).
+  Na inicialização, ler e aplicar antes do primeiro render para evitar
+  flash de tema errado (FOUC).
+
+--------------------------------------------------------------------------------
+  5. TIPOGRAFIA
+--------------------------------------------------------------------------------
+
+  Fonte escolhida: PLUS JAKARTA SANS
+  Google Fonts CDN: https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:
+                    wght@300;400;500;600;700;800&display=swap
+
+  Por que Plus Jakarta Sans:
+    · Premium e contemporânea — diferencia do Conta Azul e concorrentes
+    · Excelente legibilidade em números financeiros (dígitos bem espaçados)
+    · Suporta pesos 300 a 800, dando amplitude para a hierarquia visual
+    · Funciona muito bem nos tamanhos pequenos de labels e badges
+
+  Escala tipográfica:
+
+    display-xl:   font-size: 48px  · font-weight: 800  · letter-spacing: -0.05em
+                  Uso: números financeiros principais (saldo total, faturamento)
+
+    display-lg:   font-size: 36px  · font-weight: 800  · letter-spacing: -0.04em
+                  Uso: KPI cards principais
+
+    display-md:   font-size: 28px  · font-weight: 700  · letter-spacing: -0.03em
+                  Uso: KPI secundários, totais de seção
+
+    heading-lg:   font-size: 18px  · font-weight: 700  · letter-spacing: -0.02em
+                  Uso: título de página, título de card principal
+
+    heading-md:   font-size: 15px  · font-weight: 600  · letter-spacing: -0.01em
+                  Uso: título de card, seção de sidebar
+
+    heading-sm:   font-size: 13px  · font-weight: 600  · letter-spacing:  0em
+                  Uso: nome de paciente/psicóloga em tabela
+
+    body:         font-size: 13px  · font-weight: 400  · letter-spacing:  0em
+                  Uso: texto corrido, descrições
+
+    label:        font-size: 11.5px · font-weight: 600 · letter-spacing: 0.01em
+                  Uso: labels de KPI ("Faturamento realizado")
+
+    caption:      font-size: 10.5px · font-weight: 600 · letter-spacing: 0.08em
+                  text-transform: uppercase
+                  Uso: headers de tabela, seções de nav ("MENU", "FERRAMENTAS")
+
+    mono:         font-family: 'JetBrains Mono' ou 'Fira Code' (fallback)
+                  font-size: 13px · font-weight: 400
+                  Uso: valores exatos de hex, CPF, datas em formato ISO
+
+  REGRA DOS NÚMEROS FINANCEIROS:
+    O valor principal (ex: "R$ 18.240") usa display-lg ou display-xl.
+    Os centavos (",00") usem o mesmo peso mas com font-size 55% menor
+    e opacity: 0.5. Isso cria hierarquia visual dentro do próprio número,
+    exatamente como no Fundcy de referência.
+
+    Exemplo correto:
+      <span class="display-lg">R$ 18.240</span>
+      <span class="display-lg" style="font-size:55%;opacity:0.5">,00</span>
+
+--------------------------------------------------------------------------------
+  6. COMPONENTES — REGRAS ESPECÍFICAS
+--------------------------------------------------------------------------------
+
+  ── 6.1 CARDS ────────────────────────────────────────────────────────────────
+
+    border-radius: 18px a 24px (nunca abaixo de 14px)
+    background:    var(--surface) — branco puro
+    border:        1px solid var(--border) — nunca box-shadow como borda
+    padding:       20px 22px (padrão) · 16px 18px (compacto)
+    box-shadow:    NENHUMA no estado padrão
+    box-shadow:    0 4px 16px rgba(74,134,200,0.08) NO HOVER apenas
+    transition:    border-color 0.2s, box-shadow 0.2s
+
+    No hover, a borda troca para var(--primary) e aparece a sombra suave.
+    Isso sinaliza interatividade sem ser agressivo.
+
+  ── 6.2 SIDEBAR ──────────────────────────────────────────────────────────────
+
+    background: var(--surface) — branca, não colorida
+    border-right: 1px solid var(--border)
+    width: 210px (fixa)
+
+    Item ativo:
+      background: var(--primary-50)
+      color: var(--primary-500)
+      font-weight: 600
+
+    Item hover:
+      background: var(--surface-2)
+      color: var(--text)
+
+    NUNCA coloque sidebar escura com texto claro no tema claro.
+    A sidebar colorida vai contra o estilo Fundcy de referência.
+
+  ── 6.3 BOTÃO PRIMÁRIO ───────────────────────────────────────────────────────
+
+    background:    var(--primary)    → #4A86C8
+    color:         #FFFFFF
+    border-radius: 10px
+    padding:       8px 16px
+    font-weight:   600
+    font-size:     13px
+
+    Hover:   background escurece para var(--primary-400) → #3876BA
+    Active:  background var(--primary-500), scale(0.98)
+    Focus:   box-shadow: 0 0 0 3px rgba(74,134,200,0.25)
+
+  ── 6.4 PILLS DE STATUS ──────────────────────────────────────────────────────
+
+    Estrutura: ponto colorido + texto. Nunca ícone + texto (ocupa espaço demais).
+
+    border-radius: 20px (pill shape)
+    padding:       3px 10px
+    font-size:     11px
+    font-weight:   600
+
+    Realizada:        background #EBF5F0 · color #196040 · dot #2E9A68
+    Agendada:         background #EBF4FF · color #1F4F80 · dot #4A86C8
+    Em atraso:        background #FFF8E6 · color #7A4900 · dot #F59E0B
+    Faltou/Cobrar:    background #FFF0F0 · color #8A1C1C · dot #E53935
+    Faltou/N.Cobrar:  background #F2EFFE · color #3D2A8A · dot #8B72D4
+    Cancelada:        background #F7F9FC · color #9BAAB8 · dot #9BAAB8
+
+  ── 6.5 GRÁFICO DE BARRAS (estilo Fundcy) ────────────────────────────────────
+
+    As barras do gráfico seguem exatamente a paleta primária:
+
+      Receita (barra principal):  var(--primary) → #4A86C8
+      Despesa (barra secundária): var(--primary-100) → #C8DEFA
+      Repasse (barra terciária):  var(--sage-300) → #4CAF82
+
+    Barra destacada (hover/selected):
+      background: var(--primary-400) → #3876BA
+      box-shadow: 0 0 0 2px var(--primary-100)
+
+    Barras futuras (meses ainda não realizados):
+      opacity: 0.35 — para diferenciar visualmente realizado de previsto
+
+    Tooltip:
+      background: var(--primary-800) → #1A4478
+      color: #FFFFFF
+      border-radius: 10px
+      padding: 7px 12px
+
+  ── 6.6 BARRA DE PROGRESSO ───────────────────────────────────────────────────
+
+    Track (fundo):  height 6px · background var(--border) · border-radius 20px
+    Fill (preench): background var(--sage-300) · border-radius 20px
+    Animação:       transition width 0.6s ease (anima ao carregar)
+
+  ── 6.7 INPUTS ───────────────────────────────────────────────────────────────
+
+    background:    var(--surface-2) → #F7F9FC
+    border:        1px solid var(--border)
+    border-radius: 10px
+    padding:       8px 12px
+    font-size:     13px
+    height:        36px
+
+    Focus: border-color var(--primary) + box-shadow 0 0 0 3px rgba(74,134,200,0.15)
+    Error: border-color #E53935 + box-shadow 0 0 0 3px rgba(229,57,53,0.12)
+
+  ── 6.8 BADGES E CONTADORES ──────────────────────────────────────────────────
+
+    Nav badge (número):
+      background: var(--surface-2)
+      color: var(--text-muted)
+      font-size: 11px
+      font-weight: 600
+      padding: 1px 6px
+      border-radius: 20px
+
+    Nav badge ativo:
+      background: var(--primary-100)
+      color: var(--primary-500)
+
+    Badge de alerta (urgente):
+      background: #E53935
+      color: #FFFFFF
+
+--------------------------------------------------------------------------------
+  7. SELETOR DE TEMA — IMPLEMENTAÇÃO NO ANGULAR
+--------------------------------------------------------------------------------
+
+  O seletor de tema deve ser acessível via ícone no canto superior direito
+  da topbar. Ao clicar, abre um dropdown com as opções.
+
+  ESTRUTURA DO DROPDOWN:
+
+    ┌─────────────────────────────┐
+    │  Aparencia                  │
+    │                             │
+    │  Tema                       │
+    │  ◉ Claro    ○ Escuro        │
+    │                             │
+    │  Cor de acento              │
+    │  ● Azul Clínica   (atual)   │
+    │  ● Teal Saúde               │
+    │  ● Violeta Bem-estar        │
+    │  ● Slate Premium            │
+    │                             │
+    │  Fonte                      │
+    │  ◉ Plus Jakarta Sans        │
+    │  ○ DM Sans                  │
+    │  ○ Outfit                   │
+    └─────────────────────────────┘
+
+  ThemeService (Angular):
+    · Expõe: currentTheme$, currentColor$, currentFont$
+    · Persiste em: localStorage
+    · Aplica via: document.documentElement.setAttribute('data-theme', theme)
+                  document.documentElement.setAttribute('data-color', color)
+    · No app.component.ts, subscriba ao ThemeService no ngOnInit
+
+  Prevenção de FOUC (Flash of Unstyled Content):
+    No index.html, antes do </head>, adicione um script inline que lê o
+    localStorage e aplica o data-theme imediatamente, antes do Angular iniciar.
+    Isso evita o flash de tema errado na primeira carga.
+
+    <script>
+      (function() {
+        var t = localStorage.getItem('psico-theme') || 'light';
+        var c = localStorage.getItem('psico-color') || '1';
+        document.documentElement.setAttribute('data-theme', t);
+        document.documentElement.setAttribute('data-color', c);
+      })();
+    </script>
+
+--------------------------------------------------------------------------------
+  8. ANIMAÇÕES E MICRO-INTERAÇÕES
+--------------------------------------------------------------------------------
+
+  PRINCÍPIO: Uma animação bem feita vale mais que dez mediocres.
+  O sistema prioriza QUALIDADE sobre quantidade de animações.
+
+  Animações obrigatórias:
+
+    1. Entrada dos cards no dashboard:
+       fadeUp — opacity: 0→1, translateY: 12px→0
+       duration: 380ms · easing: cubic-bezier(0.16, 1, 0.3, 1)
+       Stagger: cada card com delay de 60ms a mais que o anterior
+
+    2. Atualização de valores numéricos:
+       Counter animation — os números "rolam" de 0 até o valor final
+       duration: 800ms · easing: ease-out
+       Usar requestAnimationFrame para suavidade
+
+    3. Barras do gráfico:
+       Crescem de 0% até a altura final no carregamento
+       duration: 600ms · easing: ease-out
+       Stagger de 40ms entre cada barra
+
+    4. Troca de tema:
+       Transition em todas as propriedades de cor: 200ms
+       background-color, color, border-color: transition 200ms ease
+
+  Animações proibidas:
+    · Bounce exagerado — inconsistente com o contexto clínico/financeiro
+    · Rotações e flips — distraem do dado
+    · Animações que duram mais de 500ms — parecem lentas
+
+  Respeito ao prefers-reduced-motion:
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+
+--------------------------------------------------------------------------------
+  9. GRID E ESPAÇAMENTO
+--------------------------------------------------------------------------------
+
+  Sistema de grid: CSS Grid + Flexbox
+  Base de espaçamento: múltiplos de 4px
+
+    4px   · Micro (gap entre ícone e texto)
+    8px   · XS (padding interno de badge, gap entre pills)
+    12px  · SM (gap entre cards)
+    16px  · MD (padding interno de card compacto, gap interno)
+    20px  · LG (padding interno de card padrão)
+    24px  · XL (padding do layout principal)
+    32px  · 2XL (gap entre seções)
+    48px  · 3XL (margem de seção grande)
+
+  Layout do dashboard principal:
+
+    Top row (3 colunas):
+      grid-template-columns: 280px 1fr 300px
+      gap: 14px
+
+    Chart row (2 colunas):
+      grid-template-columns: 1fr 300px
+      gap: 14px
+
+    Breakpoint tablet (< 1280px):
+      Top row → 2 colunas, o terceiro card vai para baixo
+
+    Breakpoint mobile (< 768px):
+      Tudo em coluna única · sidebar vira drawer (slide-in)
+
+--------------------------------------------------------------------------------
+  10. ACESSIBILIDADE
+--------------------------------------------------------------------------------
+
+  · Contraste mínimo de 4.5:1 para texto normal (WCAG AA)
+  · Contraste mínimo de 3:1 para texto grande (≥18px bold)
+  · Todo elemento interativo com outline no focus (não remover!)
+  · Imagens e ícones decorativos com aria-hidden="true"
+  · Tabelas com cabeçalhos semânticos (scope="col")
+  · Status coloridos sempre acompanhados de texto (não apenas a cor)
+  · Skip link para o conteúdo principal
+
+--------------------------------------------------------------------------------
+  11. TOKENS CSS — ARQUIVO GLOBAL
+--------------------------------------------------------------------------------
+
+  Criar em: src/styles/tokens.css
+  Importar em: src/styles.css com @import './tokens.css'
+
+  :root {
+    /* Primária */
+    --color-primary-50:   #EBF4FF;
+    --color-primary-100:  #C8DEFA;
+    --color-primary-300:  #4A86C8;
+    --color-primary-400:  #3876BA;
+    --color-primary-500:  #2D6BA8;
+    --color-primary-700:  #1F4F80;
+    --color-primary-800:  #1A4478;
+    --color-primary-900:  #122E50;
+
+    /* Sage */
+    --color-sage-50:    #EBF5F0;
+    --color-sage-300:   #4CAF82;
+    --color-sage-400:   #2E9A68;
+    --color-sage-700:   #196040;
+    --color-sage-800:   #104030;
+
+    /* Lavanda */
+    --color-lavender-50:   #F2EFFE;
+    --color-lavender-300:  #8B72D4;
+    --color-lavender-500:  #6650B0;
+    --color-lavender-800:  #3D2A8A;
+
+    /* Neutros */
+    --color-bg:          #EFF1F5;
+    --color-surface:     #FFFFFF;
+    --color-surface-2:   #F7F9FC;
+    --color-border:      #E2E5EC;
+    --color-border-2:    #CDD2DC;
+    --color-text:        #111827;
+    --color-muted:       #6B7585;
+    --color-hint:        #9BAAB8;
+
+    /* Semânticas */
+    --color-success:     #2E9A68;
+    --color-success-bg:  #EBF5F0;
+    --color-warning:     #F59E0B;
+    --color-warning-bg:  #FFF8E6;
+    --color-danger:      #E53935;
+    --color-danger-bg:   #FFF0F0;
+    --color-info:        #4A86C8;
+    --color-info-bg:     #EBF4FF;
+
+    /* Tipografia */
+    --font-sans:    'Plus Jakarta Sans', sans-serif;
+    --font-mono:    'JetBrains Mono', monospace;
+
+    /* Bordas */
+    --radius-sm:  8px;
+    --radius-md:  10px;
+    --radius-lg:  14px;
+    --radius-xl:  18px;
+    --radius-2xl: 24px;
+  }
+
+  [data-theme="dark"] {
+    --color-bg:        #0F1923;
+    --color-surface:   #1A2535;
+    --color-surface-2: #212F42;
+    --color-border:    #2A3A50;
+    --color-border-2:  #3A4E68;
+    --color-text:      #E8EDF4;
+    --color-muted:     #7A8FA6;
+    --color-hint:      #4A6075;
+    --color-primary-300: #5B9AD8;
+    --color-primary-800: #93BBE8;
+    --color-primary-50:  #1A2E45;
+    --color-primary-100: #1F3A58;
+    --color-sage-300:    #3BAF78;
+    --color-sage-50:     #0F2820;
+    --color-lavender-300: #9B84E0;
+    --color-lavender-50:  #1E1640;
+  }
+
+================================================================================
+  FIM DO DOCUMENTO — PsicoFinance Design System v1.0
+  Dúvidas: CloudySolutions · Última revisão: Março 2026
+================================================================================

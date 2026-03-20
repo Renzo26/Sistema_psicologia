@@ -1,0 +1,152 @@
+// ============================================================================
+//  PSICOFINANCE — DESIGN TOKENS
+//  Baseado no Design System v1.0 — Estilo "Clean Financial Dashboard" (Fundcy)
+// ============================================================================
+
+// ---------- TEMA CLARO (DEFAULT) ----------
+:root,
+[data-theme="light"] {
+  // Primária — Azul-Psicologia
+  --color-primary-50:   #EBF4FF;
+  --color-primary-100:  #C8DEFA;
+  --color-primary-300:  #4A86C8;
+  --color-primary-400:  #3876BA;
+  --color-primary-500:  #2D6BA8;
+  --color-primary-700:  #1F4F80;
+  --color-primary-800:  #1A4478;
+  --color-primary-900:  #122E50;
+
+  // Sage — Verde
+  --color-sage-50:    #EBF5F0;
+  --color-sage-100:   #B8E4CE;
+  --color-sage-300:   #4CAF82;
+  --color-sage-400:   #2E9A68;
+  --color-sage-500:   #248055;
+  --color-sage-700:   #196040;
+  --color-sage-800:   #104030;
+
+  // Lavanda
+  --color-lavender-50:   #F2EFFE;
+  --color-lavender-300:  #8B72D4;
+  --color-lavender-500:  #6650B0;
+  --color-lavender-800:  #3D2A8A;
+
+  // Neutros
+  --color-bg:          #EFF1F5;
+  --color-surface:     #FFFFFF;
+  --color-surface-2:   #F7F9FC;
+  --color-border:      #E2E5EC;
+  --color-border-2:    #CDD2DC;
+  --color-text:        #111827;
+  --color-muted:       #6B7585;
+  --color-hint:        #9BAAB8;
+
+  // Semânticas
+  --color-success:     #2E9A68;
+  --color-success-bg:  #EBF5F0;
+  --color-warning:     #F59E0B;
+  --color-warning-bg:  #FFF8E6;
+  --color-danger:      #E53935;
+  --color-danger-bg:   #FFF0F0;
+  --color-info:        #4A86C8;
+  --color-info-bg:     #EBF4FF;
+
+  // Tipografia
+  --font-sans:    'Plus Jakarta Sans', sans-serif;
+  --font-mono:    'JetBrains Mono', 'Fira Code', monospace;
+
+  // Bordas
+  --radius-sm:  8px;
+  --radius-md:  10px;
+  --radius-lg:  14px;
+  --radius-xl:  18px;
+  --radius-2xl: 24px;
+
+  // Sombras
+  --shadow-card-hover: 0 4px 16px rgba(74, 134, 200, 0.08);
+  --shadow-focus:      0 0 0 3px rgba(74, 134, 200, 0.25);
+  --shadow-focus-sm:   0 0 0 3px rgba(74, 134, 200, 0.15);
+  --shadow-danger:     0 0 0 3px rgba(229, 57, 53, 0.12);
+
+  // Sidebar
+  --sidebar-width: 210px;
+}
+
+// ---------- TEMA ESCURO ----------
+[data-theme="dark"] {
+  --color-bg:            #0F1923;
+  --color-surface:       #1A2535;
+  --color-surface-2:     #212F42;
+  --color-border:        #2A3A50;
+  --color-border-2:      #3A4E68;
+  --color-text:          #E8EDF4;
+  --color-muted:         #7A8FA6;
+  --color-hint:          #4A6075;
+
+  --color-primary-50:    #1A2E45;
+  --color-primary-100:   #1F3A58;
+  --color-primary-300:   #5B9AD8;
+  --color-primary-400:   #4A8ACA;
+  --color-primary-500:   #3D7DBD;
+  --color-primary-700:   #93BBE8;
+  --color-primary-800:   #93BBE8;
+  --color-primary-900:   #B0D0F0;
+
+  --color-sage-50:       #0F2820;
+  --color-sage-300:      #3BAF78;
+  --color-sage-400:      #2E9A68;
+
+  --color-lavender-50:   #1E1640;
+  --color-lavender-300:  #9B84E0;
+
+  --color-success:       #3BAF78;
+  --color-success-bg:    #0F2820;
+  --color-warning:       #F5AD2B;
+  --color-warning-bg:    #2A2210;
+  --color-danger:        #EF5350;
+  --color-danger-bg:     #2A1010;
+  --color-info:          #5B9AD8;
+  --color-info-bg:       #1A2E45;
+
+  --shadow-card-hover: 0 4px 16px rgba(91, 154, 216, 0.12);
+  --shadow-focus:      0 0 0 3px rgba(91, 154, 216, 0.3);
+  --shadow-focus-sm:   0 0 0 3px rgba(91, 154, 216, 0.2);
+}
+
+// ---------- VARIAÇÕES DE COR ----------
+[data-color="1"] {
+  // Azul-Psicologia (padrão) — já definido no :root
+}
+
+[data-color="2"] {
+  --color-primary-50:   #E6F7F5;
+  --color-primary-100:  #B2E8E2;
+  --color-primary-300:  #0F9B8E;
+  --color-primary-400:  #0D8A7E;
+  --color-primary-500:  #0B7A70;
+  --color-primary-700:  #076B62;
+  --color-primary-800:  #076B62;
+  --color-primary-900:  #054A44;
+}
+
+[data-color="3"] {
+  --color-primary-50:   #F0EAFE;
+  --color-primary-100:  #D6C8FA;
+  --color-primary-300:  #7C5CBF;
+  --color-primary-400:  #6E4FB0;
+  --color-primary-500:  #6044A0;
+  --color-primary-700:  #4A3480;
+  --color-primary-800:  #4A3480;
+  --color-primary-900:  #352560;
+}
+
+[data-color="4"] {
+  --color-primary-50:   #F7F8FA;
+  --color-primary-100:  #E2E8F0;
+  --color-primary-300:  #4A5568;
+  --color-primary-400:  #3D4A5C;
+  --color-primary-500:  #2D3748;
+  --color-primary-700:  #1A202C;
+  --color-primary-800:  #1A202C;
+  --color-primary-900:  #0F1318;
+}

@@ -1,1 +1,81 @@
-/* You can add global styles to this file, and also import other style files */
+@import './styles/tokens';
+@import './styles/typography';
+@import './styles/components';
+@import './styles/animations';
+
+// ============================================================================
+//  PSICOFINANCE — ESTILOS GLOBAIS
+// ============================================================================
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--color-text);
+  background: var(--color-bg);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+a {
+  color: var(--color-primary-300);
+  text-decoration: none;
+
+  &:hover {
+    color: var(--color-primary-400);
+  }
+}
+
+::selection {
+  background: var(--color-primary-100);
+  color: var(--color-primary-800);
+}
+
+// Scrollbar customizada
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-2);
+  border-radius: 20px;
+
+  &:hover {
+    background: var(--color-muted);
+  }
+}
+
+// Skip link para acessibilidade
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 16px;
+  z-index: 9999;
+  padding: 8px 16px;
+  background: var(--color-primary-300);
+  color: #fff;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+
+  &:focus {
+    top: 16px;
+  }
+}

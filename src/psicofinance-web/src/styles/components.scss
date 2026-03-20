@@ -1,0 +1,246 @@
+// ============================================================================
+//  PSICOFINANCE — COMPONENTES GLOBAIS
+//  Cards, Botões, Pills, Inputs, Badges — Design System v1.0
+// ============================================================================
+
+// ---------- CARDS ----------
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: 20px 22px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+
+  &--compact {
+    padding: 16px 18px;
+  }
+
+  &--interactive {
+    cursor: pointer;
+
+    &:hover {
+      border-color: var(--color-primary-300);
+      box-shadow: var(--shadow-card-hover);
+    }
+  }
+}
+
+// ---------- BOTÕES ----------
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 8px 16px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s, transform 0.1s, box-shadow 0.15s;
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &--primary {
+    background: var(--color-primary-300);
+    color: #FFFFFF;
+
+    &:hover {
+      background: var(--color-primary-400);
+    }
+
+    &:active {
+      background: var(--color-primary-500);
+    }
+  }
+
+  &--secondary {
+    background: var(--color-surface-2);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+
+    &:hover {
+      background: var(--color-border);
+    }
+  }
+
+  &--ghost {
+    background: transparent;
+    color: var(--color-muted);
+
+    &:hover {
+      background: var(--color-surface-2);
+      color: var(--color-text);
+    }
+  }
+
+  &--danger {
+    background: var(--color-danger);
+    color: #FFFFFF;
+
+    &:hover {
+      background: #D32F2F;
+    }
+  }
+
+  &--sm {
+    padding: 5px 10px;
+    font-size: 12px;
+  }
+
+  &--lg {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+}
+
+// ---------- PILLS DE STATUS ----------
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+
+  &__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  &--realizada {
+    background: var(--color-success-bg);
+    color: #196040;
+    .pill__dot { background: #2E9A68; }
+  }
+
+  &--agendada {
+    background: var(--color-info-bg);
+    color: #1F4F80;
+    .pill__dot { background: #4A86C8; }
+  }
+
+  &--atraso {
+    background: var(--color-warning-bg);
+    color: #7A4900;
+    .pill__dot { background: #F59E0B; }
+  }
+
+  &--faltou {
+    background: var(--color-danger-bg);
+    color: #8A1C1C;
+    .pill__dot { background: #E53935; }
+  }
+
+  &--faltou-nc {
+    background: #F2EFFE;
+    color: #3D2A8A;
+    .pill__dot { background: #8B72D4; }
+  }
+
+  &--cancelada {
+    background: var(--color-surface-2);
+    color: var(--color-hint);
+    .pill__dot { background: var(--color-hint); }
+  }
+}
+
+// ---------- INPUTS ----------
+.input {
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  height: 36px;
+  color: var(--color-text);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  width: 100%;
+
+  &::placeholder {
+    color: var(--color-hint);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-primary-300);
+    box-shadow: var(--shadow-focus-sm);
+  }
+
+  &--error {
+    border-color: var(--color-danger);
+    box-shadow: var(--shadow-danger);
+  }
+}
+
+textarea.input {
+  height: auto;
+  min-height: 80px;
+  resize: vertical;
+}
+
+select.input {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236B7585' d='M6 8.825a.5.5 0 01-.354-.146l-3.5-3.5a.5.5 0 11.708-.708L6 7.618l3.146-3.147a.5.5 0 11.708.708l-3.5 3.5A.5.5 0 016 8.825z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 30px;
+}
+
+// ---------- BADGES ----------
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 20px;
+  background: var(--color-surface-2);
+  color: var(--color-muted);
+
+  &--active {
+    background: var(--color-primary-100);
+    color: var(--color-primary-500);
+  }
+
+  &--alert {
+    background: var(--color-danger);
+    color: #FFFFFF;
+  }
+}
+
+// ---------- BARRA DE PROGRESSO ----------
+.progress {
+  height: 6px;
+  background: var(--color-border);
+  border-radius: 20px;
+  overflow: hidden;
+
+  &__fill {
+    height: 100%;
+    background: var(--color-sage-300);
+    border-radius: 20px;
+    transition: width 0.6s ease;
+  }
+}
+
+// ---------- DIVIDER ----------
+.divider {
+  height: 1px;
+  background: var(--color-border);
+  margin: 16px 0;
+}
