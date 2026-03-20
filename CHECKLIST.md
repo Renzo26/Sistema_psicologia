@@ -9,36 +9,36 @@
 
 ### 0.1 — Estrutura do Projeto
 - [x] Criar solution .NET com estrutura de pastas (Api, Domain, Application, Infrastructure, Tests)
-- [ ] Configurar projeto Angular 18+ com lazy-loaded modules
+- [x] Configurar projeto Angular 18+ com lazy-loaded modules
 - [x] Criar scripts SQL para todas as tabelas (pasta `/sql`) — Supabase + N8N já hospedados na VPS
 - [x] Configurar `.gitignore`, `.editorconfig` e `README.md`
 
 ### 0.2 — Configurações Base .NET
 - [x] Instalar pacotes NuGet: MediatR, FluentValidation, EF Core, Hangfire, JWT Bearer
 - [x] Instalar pacotes NuGet: xUnit, FluentAssertions, Testcontainers
-- [ ] Configurar `appsettings.json` e `appsettings.Development.json`
-- [ ] Configurar Serilog para logging estruturado
-- [ ] Configurar ProblemDetails (RFC 7807) para respostas de erro
-- [ ] Configurar rate limiting (100 req/min público, 300 req/min autenticado)
-- [ ] Configurar CORS para o frontend Angular
+- [x] Configurar `appsettings.json` e `appsettings.Development.json`
+- [x] Configurar Serilog para logging estruturado
+- [x] Configurar ProblemDetails (RFC 7807) para respostas de erro
+- [x] Configurar rate limiting (100 req/min público, 300 req/min autenticado)
+- [x] Configurar CORS para o frontend Angular
 
 ### 0.3 — Configurações Base Angular
-- [ ] Configurar `ApiService` centralizado (HttpClient)
-- [ ] Configurar interceptor de JWT (Bearer token)
-- [ ] Configurar interceptor de refresh token (cookie HttpOnly)
-- [ ] Configurar NgRx Signal Store para estado global
-- [ ] Configurar estratégia OnPush em todos os componentes
-- [ ] Configurar guards de rota (autenticação)
-- [ ] Configurar tratamento global de erros HTTP
+- [x] Configurar `ApiService` centralizado (HttpClient)
+- [x] Configurar interceptor de JWT (Bearer token)
+- [x] Configurar interceptor de refresh token (cookie HttpOnly)
+- [x] Configurar NgRx Signal Store para estado global
+- [x] Configurar estratégia OnPush em todos os componentes
+- [x] Configurar guards de rota (autenticação)
+- [x] Configurar tratamento global de erros HTTP
 
 ### 0.4 — Banco de Dados & Multi-tenancy
-- [ ] Configurar EF Core com PostgreSQL (snake_case naming)
-- [ ] Implementar estratégia multi-tenant: schema por tenant
-- [ ] Criar `TenantMiddleware` para resolver tenant via JWT/subdomínio
-- [ ] Implementar `TenantDbContext` com filtros globais por tenant
-- [ ] Criar mecanismo de criação automática de schema por novo tenant
-- [ ] Configurar soft delete global (`excluido_em`)
-- [ ] Configurar TIMESTAMPTZ para todos os campos de data
+- [x] Configurar EF Core com PostgreSQL (snake_case naming)
+- [x] Implementar estratégia multi-tenant: schema por tenant
+- [x] Criar `TenantMiddleware` para resolver tenant via JWT/subdomínio
+- [x] Implementar `TenantDbContext` com filtros globais por tenant
+- [x] Criar mecanismo de criação automática de schema por novo tenant
+- [x] Configurar soft delete global (`excluido_em`)
+- [x] Configurar TIMESTAMPTZ para todos os campos de data
 
 ---
 
