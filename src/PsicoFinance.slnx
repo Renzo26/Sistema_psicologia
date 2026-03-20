@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="PsicoFinance.Api/PsicoFinance.Api.csproj" />
+  <Project Path="PsicoFinance.Application/PsicoFinance.Application.csproj" />
+  <Project Path="PsicoFinance.Domain/PsicoFinance.Domain.csproj" />
+  <Project Path="PsicoFinance.Infrastructure/PsicoFinance.Infrastructure.csproj" />
+  <Project Path="PsicoFinance.Tests/PsicoFinance.Tests.csproj" />
+</Solution>

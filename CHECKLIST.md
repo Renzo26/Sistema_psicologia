@@ -8,14 +8,14 @@
 ## FASE 0 — Infraestrutura & Setup Inicial
 
 ### 0.1 — Estrutura do Projeto
-- [ ] Criar solution .NET com estrutura de pastas (Api, Domain, Application, Infrastructure, Tests)
+- [x] Criar solution .NET com estrutura de pastas (Api, Domain, Application, Infrastructure, Tests)
 - [ ] Configurar projeto Angular 18+ com lazy-loaded modules
 - [x] Criar scripts SQL para todas as tabelas (pasta `/sql`) — Supabase + N8N já hospedados na VPS
-- [ ] Configurar `.gitignore`, `.editorconfig` e `README.md`
+- [x] Configurar `.gitignore`, `.editorconfig` e `README.md`
 
 ### 0.2 — Configurações Base .NET
-- [ ] Instalar pacotes NuGet: MediatR, FluentValidation, EF Core, Hangfire, JWT Bearer
-- [ ] Instalar pacotes NuGet: xUnit, FluentAssertions, Testcontainers
+- [x] Instalar pacotes NuGet: MediatR, FluentValidation, EF Core, Hangfire, JWT Bearer
+- [x] Instalar pacotes NuGet: xUnit, FluentAssertions, Testcontainers
 - [ ] Configurar `appsettings.json` e `appsettings.Development.json`
 - [ ] Configurar Serilog para logging estruturado
 - [ ] Configurar ProblemDetails (RFC 7807) para respostas de erro
@@ -331,4 +331,4 @@
 
 ---
 
-*Atualizado em: 2026-03-19*
+*Atualizado em: 2026-03-20*
