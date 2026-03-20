@@ -46,6 +46,17 @@ d:/sitema_psicologia/
 
 Cada clínica possui seu próprio schema no PostgreSQL. O `TenantId` é resolvido via JWT e injetado automaticamente em todas as queries via EF Core `HasQueryFilter`.
 
+## Relatórios Personalizados (B.I.)
+
+O sistema inclui um módulo completo de Business Intelligence com:
+
+- **Motor de relatórios** com filtros dinâmicos, agrupamentos e ordenação configuráveis
+- **Templates pré-definidos**: faturamento, produtividade por psicólogo, inadimplência (aging 30/60/90), comparativo mensal, ocupação de agenda, repasses e fluxo de caixa projetado
+- **Relatórios personalizados**: o usuário pode criar seus próprios relatórios com construtor visual de filtros
+- **Exportação**: PDF, Excel (.xlsx) e CSV
+- **Visualização interativa**: gráficos de barras, linhas, pizza e área com drill-down
+- **Agendamento automático**: envio periódico por email/WhatsApp via integração N8N
+
 ## Segurança (LGPD)
 
 Dados sensíveis de pacientes (CPF, telefone, email) são criptografados em repouso com AES-256.

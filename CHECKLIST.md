@@ -281,6 +281,49 @@
 
 ---
 
+## MÓDULO 7 — Relatórios Personalizados (B.I.)
+
+### 7.1 — Motor de Relatórios
+- [ ] Criar entidade `RelatorioPersonalizado` (nome, descrição, tipo, filtros, criado_por)
+- [ ] Criar enum `TipoRelatorio` (Financeiro, Sessoes, Pacientes, Psicologos, Inadimplencia, Repasses)
+- [ ] Implementar engine de filtros dinâmicos (período, psicólogo, paciente, status, plano de conta)
+- [ ] Implementar agrupamento configurável (por dia, semana, mês, trimestre, ano)
+- [ ] Implementar ordenação e paginação nos resultados
+- [ ] Command: `CriarRelatorioPersonalizadoCommand` + Handler + Validator
+- [ ] Command: `AtualizarRelatorioPersonalizadoCommand` + Handler
+- [ ] Command: `ExcluirRelatorioPersonalizadoCommand` + Handler
+- [ ] Query: `ListarRelatoriosPersonalizadosQuery` + Handler
+- [ ] Query: `ExecutarRelatorioQuery` + Handler (retorna dados formatados)
+
+### 7.2 — Templates de Relatório Pré-definidos
+- [ ] Template: Faturamento por período (receitas vs despesas)
+- [ ] Template: Produtividade por psicólogo (sessões realizadas, faltas, receita gerada)
+- [ ] Template: Análise de inadimplência (aging report — 30/60/90 dias)
+- [ ] Template: Comparativo mensal (mês atual vs anterior vs mesmo mês ano anterior)
+- [ ] Template: Ranking de pacientes por receita gerada
+- [ ] Template: Ocupação de agenda (horários ocupados vs disponíveis)
+- [ ] Template: Repasses por psicólogo com detalhamento por sessão
+- [ ] Template: Fluxo de caixa projetado (próximos 30/60/90 dias)
+
+### 7.3 — Exportação e Visualização
+- [ ] Exportar relatórios em PDF (QuestPDF)
+- [ ] Exportar relatórios em Excel (.xlsx — ClosedXML ou similar)
+- [ ] Exportar relatórios em CSV
+- [ ] Endpoint: `GET /relatorios/{id}/executar` (JSON com dados)
+- [ ] Endpoint: `GET /relatorios/{id}/exportar?formato=pdf|xlsx|csv`
+- [ ] Endpoints REST: CRUD completo `/relatorios`
+
+### 7.4 — Frontend B.I.
+- [ ] Tela de listagem de relatórios (pré-definidos + personalizados)
+- [ ] Tela de criação/edição de relatório com construtor visual de filtros
+- [ ] Visualização de resultados com gráficos interativos (barras, linhas, pizza, área)
+- [ ] Drill-down: clicar em dado do gráfico para ver detalhes
+- [ ] Salvar relatórios como favoritos
+- [ ] Agendar envio automático de relatório por email/WhatsApp (via N8N)
+- [ ] Testes unitários e de integração
+
+---
+
 ## FASE FINAL — Qualidade & Deploy
 
 ### Segurança
@@ -318,7 +361,7 @@
 
 | Módulo | Total Tarefas | Concluídas | % |
 |---|---|---|---|
-| Fase 0 — Setup | 21 | 0 | 0% |
+| Fase 0 — Setup | 21 | 21 | 100% |
 | Fase 1 — Auth & Tenancy | 16 | 0 | 0% |
 | Módulo 1 — Cadastros | 45 | 0 | 0% |
 | Módulo 2 — Sessões | 20 | 0 | 0% |
@@ -326,8 +369,9 @@
 | Módulo 4 — Automações N8N | 16 | 0 | 0% |
 | Módulo 5 — Dashboard | 16 | 0 | 0% |
 | Módulo 6 — Documentos | 14 | 0 | 0% |
+| Módulo 7 — Relatórios B.I. | 27 | 0 | 0% |
 | Fase Final — Qualidade & Deploy | 19 | 0 | 0% |
-| **TOTAL** | **191** | **0** | **0%** |
+| **TOTAL** | **218** | **0** | **0%** |
 
 ---
 
