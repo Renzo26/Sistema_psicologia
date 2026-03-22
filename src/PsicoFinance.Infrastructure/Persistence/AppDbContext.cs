@@ -1,12 +1,13 @@
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
+using PsicoFinance.Application.Common.Interfaces;
 using PsicoFinance.Domain.Common;
 using PsicoFinance.Domain.Entities;
 using PsicoFinance.Infrastructure.MultiTenancy;
 
 namespace PsicoFinance.Infrastructure.Persistence;
 
-public class AppDbContext : DbContext
+public class AppDbContext : DbContext, IAppDbContext
 {
     private readonly ITenantProvider _tenantProvider;
 

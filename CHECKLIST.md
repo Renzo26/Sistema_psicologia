@@ -45,16 +45,16 @@
 ## FASE 1 — Autenticação & Multi-tenancy
 
 ### 1.1 — Autenticação (Auth)
-- [ ] Criar entidade `Usuario` com roles (Admin, Gerente, Secretaria, Psicologo)
-- [ ] Implementar registro de usuário com hash de senha (BCrypt)
-- [ ] Implementar login com geração de JWT (access 15min + refresh 7d)
-- [ ] Implementar refresh token via cookie HttpOnly
-- [ ] Implementar logout (invalidar refresh token)
-- [ ] Implementar troca de senha
-- [ ] Implementar recuperação de senha (email)
-- [ ] Criar tela de Login no Angular
-- [ ] Criar tela de Recuperação de Senha no Angular
-- [ ] Testes unitários de autenticação (90% cobertura domain)
+- [x] Criar entidade `Usuario` com roles (Admin, Gerente, Secretaria, Psicologo)
+- [x] Implementar registro de usuário com hash de senha (BCrypt)
+- [x] Implementar login com geração de JWT (access 15min + refresh 7d)
+- [x] Implementar refresh token via cookie HttpOnly
+- [x] Implementar logout (invalidar refresh token)
+- [x] Implementar troca de senha
+- [x] Implementar recuperação de senha (email)
+- [x] Criar tela de Login no Angular
+- [x] Criar tela de Recuperação de Senha no Angular
+- [x] Testes unitários de autenticação (90% cobertura domain)
 
 ### 1.2 — Gestão de Tenants (Clínicas)
 - [ ] Criar entidade `Clinica` (tenant raiz)
@@ -362,7 +362,7 @@
 | Módulo | Total Tarefas | Concluídas | % |
 |---|---|---|---|
 | Fase 0 — Setup | 21 | 21 | 100% |
-| Fase 1 — Auth & Tenancy | 16 | 0 | 0% |
+| Fase 1 — Auth & Tenancy | 16 | 10 | 63% |
 | Módulo 1 — Cadastros | 45 | 0 | 0% |
 | Módulo 2 — Sessões | 20 | 0 | 0% |
 | Módulo 3 — Financeiro | 24 | 0 | 0% |
@@ -371,8 +371,8 @@
 | Módulo 6 — Documentos | 14 | 0 | 0% |
 | Módulo 7 — Relatórios B.I. | 27 | 0 | 0% |
 | Fase Final — Qualidade & Deploy | 19 | 0 | 0% |
-| **TOTAL** | **218** | **0** | **0%** |
+| **TOTAL** | **218** | **31** | **14%** |
 
 ---
 
-*Atualizado em: 2026-03-20*
+*Atualizado em: 2026-03-22*

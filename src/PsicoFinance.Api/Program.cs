@@ -1,7 +1,9 @@
 using System.Threading.RateLimiting;
+using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.RateLimiting;
 using PsicoFinance.Api.Middleware;
+using PsicoFinance.Application;
 using PsicoFinance.Infrastructure;
 using Serilog;
 
@@ -11,7 +13,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSerilog((context, loggerConfig) =>
     loggerConfig.ReadFrom.Configuration(context.Configuration));
 
-// ── Infrastructure (EF Core, Multi-tenancy) ──────────────────
+// ── Application (MediatR, FluentValidation) ──────────────────
+builder.Services.AddApplication();
+
+// ── Infrastructure (EF Core, Multi-tenancy, JWT) ─────────────
 builder.Services.AddInfrastructure(builder.Configuration);
 
 // ── Controllers ──────────────────────────────────────────────
@@ -88,6 +93,7 @@ app.UseExceptionHandler(errorApp =>
 
         var statusCode = exceptionFeature?.Error switch
         {
+            ValidationException => StatusCodes.Status400BadRequest,
             ArgumentException => StatusCodes.Status400BadRequest,
             UnauthorizedAccessException => StatusCodes.Status401Unauthorized,
             KeyNotFoundException => StatusCodes.Status404NotFound,
@@ -110,6 +116,13 @@ app.UseExceptionHandler(errorApp =>
             Instance = context.Request.Path
         };
         problemDetails.Extensions["traceId"] = context.TraceIdentifier;
+
+        if (exceptionFeature?.Error is ValidationException validationEx)
+        {
+            problemDetails.Extensions["errors"] = validationEx.Errors
+                .GroupBy(e => e.PropertyName)
+                .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray());
+        }
 
         await context.Response.WriteAsJsonAsync(problemDetails);
     });

@@ -1,13 +1,16 @@
-import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ThemePickerComponent } from '../../../shared/components/theme-picker/theme-picker.component';
+import { AuthService } from '../../../core/services/auth.service';
+import { AuthStore } from '../../../core/store/auth.store';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, ThemePickerComponent],
+  imports: [CommonModule, FormsModule, RouterLink, ThemePickerComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="login-page">
@@ -58,11 +61,15 @@ import { ThemePickerComponent } from '../../../shared/components/theme-picker/th
               <input type="checkbox" [(ngModel)]="remember" name="remember" />
               <span class="body-text">Lembrar de mim</span>
             </label>
-            <a href="#" class="login-forgot body-text">Esqueceu a senha?</a>
+            <a routerLink="/auth/recuperar-senha" class="login-forgot body-text">Esqueceu a senha?</a>
           </div>
 
-          <button class="btn btn--primary login-btn" type="submit">
-            Entrar
+          @if (errorMessage()) {
+            <div class="login-error body-text">{{ errorMessage() }}</div>
+          }
+
+          <button class="btn btn--primary login-btn" type="submit" [disabled]="loading()">
+            {{ loading() ? 'Entrando...' : 'Entrar' }}
           </button>
         </form>
 
@@ -170,6 +177,16 @@ import { ThemePickerComponent } from '../../../shared/components/theme-picker/th
       margin-top: 4px;
     }
 
+    .login-error {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #dc2626;
+      padding: 10px 14px;
+      border-radius: var(--radius-lg);
+      font-size: 13px;
+      text-align: center;
+    }
+
     .login-footer {
       margin-top: 28px;
       color: var(--color-hint);
@@ -178,14 +195,36 @@ import { ThemePickerComponent } from '../../../shared/components/theme-picker/th
   `],
 })
 export class LoginComponent {
-  private router = inject(Router);
+  private readonly router = inject(Router);
+  private readonly authService = inject(AuthService);
+  private readonly destroyRef = inject(DestroyRef);
 
   email = '';
   password = '';
   remember = false;
+  loading = signal(false);
+  errorMessage = signal<string | null>(null);
 
   onLogin(): void {
-    // TODO: implementar autenticação real na FASE 1
-    this.router.navigate(['/dashboard']);
+    this.loading.set(true);
+    this.errorMessage.set(null);
+
+    this.authService
+      .login({ email: this.email, senha: this.password })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.loading.set(false);
+          this.router.navigate(['/dashboard']);
+        },
+        error: (err) => {
+          this.loading.set(false);
+          this.errorMessage.set(
+            err.status === 401
+              ? 'Email ou senha inválidos.'
+              : 'Erro ao fazer login. Tente novamente.'
+          );
+        },
+      });
   }
 }
