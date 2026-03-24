@@ -1,11 +1,12 @@
 using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using PsicoFinance.Application.Common.Interfaces;
 using PsicoFinance.Infrastructure.Persistence;
 
 namespace PsicoFinance.Infrastructure.MultiTenancy;
 
-public partial class TenantSchemaService
+public partial class TenantSchemaService : ITenantSchemaService
 {
     private readonly AppDbContext _db;
     private readonly ILogger<TenantSchemaService> _logger;

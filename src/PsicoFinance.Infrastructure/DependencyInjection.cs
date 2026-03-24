@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using PsicoFinance.Application.Common.Interfaces;
 using PsicoFinance.Infrastructure.MultiTenancy;
 using PsicoFinance.Infrastructure.Persistence;
+using PsicoFinance.Infrastructure.Services.Audit;
 using PsicoFinance.Infrastructure.Services.Auth;
 
 namespace PsicoFinance.Infrastructure;
@@ -16,9 +17,10 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         // ── Multi-tenancy ────────────────────────────────────────
-        services.AddScoped<ITenantProvider, TenantProvider>();
+        services.AddScoped<Application.Common.Interfaces.ITenantProvider, TenantProvider>();
         services.AddScoped<ITenantResolver, TenantResolver>();
         services.AddScoped<TenantSchemaService>();
+        services.AddScoped<ITenantSchemaService>(sp => sp.GetRequiredService<TenantSchemaService>());
 
         // ── EF Core + PostgreSQL ─────────────────────────────────
         services.AddDbContext<AppDbContext>((sp, options) =>
@@ -64,6 +66,9 @@ public static class DependencyInjection
         services.AddScoped<IJwtService, JwtService>();
         services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
         services.AddScoped<IEmailService, EmailService>();
+
+        // ── Audit ──────────────────────────────────────────────────
+        services.AddScoped<IAuditService, AuditService>();
 
         return services;
     }

@@ -1,0 +1,44 @@
+.onboarding-page { min-height:100vh; display:flex; align-items:center; justify-content:center; background:var(--bg-primary); padding:1rem }
+.onboarding-theme-toggle { position:fixed; top:1rem; right:1rem; z-index:10 }
+.onboarding-container { width:100%; max-width:520px; background:var(--bg-secondary); border-radius:16px; padding:2.5rem; border:1px solid var(--border-color); box-shadow:0 4px 24px rgba(0,0,0,.08) }
+.onboarding-header { text-align:center; margin-bottom:2rem }
+.onboarding-logo { width:56px; height:56px; border-radius:14px; background:var(--accent-color); color:#fff; display:flex; align-items:center; justify-content:center; margin:0 auto 1rem }
+.onboarding-header h1 { font-size:1.5rem; font-weight:700; color:var(--text-primary); margin:0 0 .25rem }
+.onboarding-subtitle { color:var(--text-secondary); font-size:.875rem; margin:0 }
+.onboarding-steps { display:flex; align-items:center; justify-content:center; margin-bottom:2rem }
+.step { display:flex; flex-direction:column; align-items:center; gap:.375rem; opacity:.4; transition:opacity .2s }
+.step.active { opacity:1 }
+.step-circle { width:32px; height:32px; border-radius:50%; border:2px solid var(--border-color); display:flex; align-items:center; justify-content:center; font-size:.8rem; font-weight:600; color:var(--text-secondary); transition:all .2s }
+.step.active .step-circle { border-color:var(--accent-color); background:var(--accent-color); color:#fff }
+.step.completed .step-circle { border-color:#22c55e; background:#22c55e; color:#fff }
+.step span { font-size:.75rem; color:var(--text-secondary) }
+.step-line { width:60px; height:2px; background:var(--border-color); margin:0 .5rem; margin-bottom:1.25rem; transition:background .2s }
+.step-line.active { background:var(--accent-color) }
+.onboarding-form { display:flex; flex-direction:column; gap:1.25rem }
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem }
+.form-group { display:flex; flex-direction:column; gap:.375rem }
+.form-group label { font-size:.8rem; font-weight:500; color:var(--text-secondary) }
+.form-group input { padding:.75rem 1rem; border:1px solid var(--border-color); border-radius:8px; font-size:.875rem; background:var(--bg-primary); color:var(--text-primary); transition:border-color .2s }
+.form-group input:focus { outline:none; border-color:var(--accent-color) }
+.form-hint { font-size:.75rem; color:var(--text-secondary) }
+.form-actions { display:flex; gap:.75rem }
+.btn-primary, .btn-secondary { display:inline-flex; align-items:center; justify-content:center; gap:.5rem; border-radius:8px; font-size:.875rem; cursor:pointer; flex:1 }
+.btn-primary { padding:.75rem 1.5rem; background:var(--accent-color); color:#fff; border:none; font-weight:600; transition:opacity .2s }
+.btn-primary:hover:not(:disabled) { opacity:.9 }
+.btn-primary:disabled { opacity:.5; cursor:not-allowed }
+.btn-secondary { padding:.75rem 1.25rem; background:transparent; color:var(--text-secondary); border:1px solid var(--border-color); font-weight:500; transition:background .2s }
+.btn-secondary:hover { background:var(--bg-primary) }
+.onboarding-error { display:flex; align-items:center; gap:.5rem; padding:.75rem 1rem; background:rgba(239,68,68,.1); border:1px solid rgba(239,68,68,.3); border-radius:8px; color:#ef4444; font-size:.8rem; margin-bottom:1rem }
+.onboarding-success { text-align:center }
+.success-icon { color:#22c55e; margin-bottom:1rem }
+.onboarding-success h2 { font-size:1.25rem; color:var(--text-primary); margin:0 0 .5rem }
+.onboarding-success p { color:var(--text-secondary); font-size:.875rem; margin:0 0 1.5rem }
+.checklist { text-align:left; background:var(--bg-primary); border-radius:10px; padding:1.25rem; margin-bottom:1.5rem; border:1px solid var(--border-color) }
+.checklist h3 { font-size:.85rem; font-weight:600; color:var(--text-primary); margin:0 0 .75rem }
+.checklist-item { display:flex; align-items:center; gap:.625rem; padding:.5rem 0; font-size:.8rem; color:var(--text-secondary); cursor:pointer }
+.checklist-item input[type="checkbox"] { accent-color:var(--accent-color); width:16px; height:16px }
+.onboarding-footer { text-align:center; margin-top:1.5rem; font-size:.8rem; color:var(--text-secondary) }
+.onboarding-footer a { color:var(--accent-color); text-decoration:none; font-weight:500; margin-left:.25rem }
+.spinner { width:16px; height:16px; border:2px solid rgba(255,255,255,.3); border-top-color:#fff; border-radius:50%; animation:spin .6s linear infinite }
+@keyframes spin { to { transform:rotate(360deg) } }
+@media(max-width:480px) { .onboarding-container { padding:1.5rem } .form-row { grid-template-columns:1fr } }

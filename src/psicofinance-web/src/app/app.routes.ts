@@ -20,6 +20,13 @@ export const routes: Routes = [
             (m) => m.DASHBOARD_ROUTES
           ),
       },
+      {
+        path: 'configuracoes',
+        loadChildren: () =>
+          import('./features/configuracoes/configuracoes.routes').then(
+            (m) => m.CONFIGURACOES_ROUTES
+          ),
+      },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],
   },

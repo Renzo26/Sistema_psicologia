@@ -5,7 +5,8 @@ import { Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ThemePickerComponent } from '../../../shared/components/theme-picker/theme-picker.component';
 import { AuthService } from '../../../core/services/auth.service';
-import { AuthStore } from '../../../core/store/auth.store';
+import { AuthStore, AuthUser } from '../../../core/store/auth.store';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -76,6 +77,21 @@ import { AuthStore } from '../../../core/store/auth.store';
         <p class="login-footer caption-text">
           PsicoFinance &copy; 2026 — Gestão para clínicas de psicologia
         </p>
+
+        @if (devMode) {
+          <div class="dev-panel">
+            <span class="dev-panel__badge">DEV MODE</span>
+            <p class="caption-text" style="color: var(--color-muted); margin: 4px 0 10px;">
+              Entrar sem backend — escolha um perfil:
+            </p>
+            <div class="dev-panel__buttons">
+              <button class="btn btn--primary btn--sm" (click)="devLogin('admin')">Admin</button>
+              <button class="btn btn--secondary btn--sm" (click)="devLogin('psicologo')">Psicólogo</button>
+              <button class="btn btn--secondary btn--sm" (click)="devLogin('secretaria')">Secretária</button>
+              <button class="btn btn--secondary btn--sm" (click)="devLogin('gerente')">Gerente</button>
+            </div>
+          </div>
+        }
       </div>
     </div>
   `,
@@ -192,18 +208,68 @@ import { AuthStore } from '../../../core/store/auth.store';
       color: var(--color-hint);
       text-align: center;
     }
+
+    .dev-panel {
+      width: 100%;
+      margin-top: 16px;
+      padding: 14px;
+      border: 1px dashed var(--color-warning, #f59e0b);
+      border-radius: var(--radius-lg);
+      background: color-mix(in srgb, var(--color-warning, #f59e0b) 6%, transparent);
+      text-align: center;
+    }
+
+    .dev-panel__badge {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: var(--color-warning, #f59e0b);
+      background: color-mix(in srgb, var(--color-warning, #f59e0b) 15%, transparent);
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    .dev-panel__buttons {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
   `],
 })
 export class LoginComponent {
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
+  private readonly authStore = inject(AuthStore);
   private readonly destroyRef = inject(DestroyRef);
+
+  readonly devMode = environment.devMode;
 
   email = '';
   password = '';
   remember = false;
   loading = signal(false);
   errorMessage = signal<string | null>(null);
+
+  devLogin(role: AuthUser['role']): void {
+    const names: Record<string, string> = {
+      admin: 'Admin Dev',
+      psicologo: 'Dr. Dev Silva',
+      secretaria: 'Secretária Dev',
+      gerente: 'Gerente Dev',
+    };
+
+    const user: AuthUser = {
+      id: '00000000-0000-0000-0000-000000000001',
+      nome: names[role] ?? 'Dev User',
+      email: `${role}@dev.local`,
+      role,
+      clinicaId: '00000000-0000-0000-0000-000000000099',
+    };
+
+    this.authStore.loginSuccess(user, 'dev-fake-token');
+    this.router.navigate(['/dashboard']);
+  }
 
   onLogin(): void {
     this.loading.set(true);

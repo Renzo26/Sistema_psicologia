@@ -1,3 +1,5 @@
+using PsicoFinance.Application.Common.Interfaces;
+
 namespace PsicoFinance.Infrastructure.MultiTenancy;
 
 public class TenantProvider : ITenantProvider

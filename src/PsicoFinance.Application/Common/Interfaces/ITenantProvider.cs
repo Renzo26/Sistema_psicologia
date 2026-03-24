@@ -1,4 +1,4 @@
-namespace PsicoFinance.Infrastructure.MultiTenancy;
+namespace PsicoFinance.Application.Common.Interfaces;
 
 public interface ITenantProvider
 {

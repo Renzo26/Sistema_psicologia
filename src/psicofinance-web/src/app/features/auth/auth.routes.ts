@@ -20,5 +20,12 @@ export const AUTH_ROUTES: Routes = [
         (m) => m.RedefinirSenhaComponent
       ),
   },
+  {
+    path: 'onboarding',
+    loadComponent: () =>
+      import('./onboarding/onboarding.component').then(
+        (m) => m.OnboardingComponent
+      ),
+  },
   { path: '', redirectTo: 'login', pathMatch: 'full' },
 ];

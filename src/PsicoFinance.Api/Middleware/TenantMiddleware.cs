@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using PsicoFinance.Application.Common.Interfaces;
 using PsicoFinance.Infrastructure.MultiTenancy;
 
 namespace PsicoFinance.Api.Middleware;

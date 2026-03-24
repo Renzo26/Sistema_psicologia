@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using PsicoFinance.Application.Common.Interfaces;
 using PsicoFinance.Domain.Common;
 using PsicoFinance.Domain.Entities;
-using PsicoFinance.Infrastructure.MultiTenancy;
 
 namespace PsicoFinance.Infrastructure.Persistence;
 
@@ -24,6 +23,7 @@ public class AppDbContext : DbContext, IAppDbContext
     public DbSet<Paciente> Pacientes => Set<Paciente>();
     public DbSet<PlanoConta> PlanosConta => Set<PlanoConta>();
     public DbSet<Contrato> Contratos => Set<Contrato>();
+    public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -57,13 +57,13 @@
 - [x] Testes unitários de autenticação (90% cobertura domain)
 
 ### 1.2 — Gestão de Tenants (Clínicas)
-- [ ] Criar entidade `Clinica` (tenant raiz)
-- [ ] Implementar criação de novo tenant (schema PostgreSQL)
-- [ ] Implementar isolamento de dados por tenant em todas as queries
-- [ ] Criar endpoint de onboarding inicial (setup da clínica)
-- [ ] Criar checklist de onboarding no Angular (<30 min meta)
-- [ ] Implementar auditoria: log de todas as ações financeiras
-- [ ] Testes de isolamento multi-tenant
+- [x] Criar entidade `Clinica` (tenant raiz)
+- [x] Implementar criação de novo tenant (schema PostgreSQL)
+- [x] Implementar isolamento de dados por tenant em todas as queries
+- [x] Criar endpoint de onboarding inicial (setup da clínica)
+- [x] Criar checklist de onboarding no Angular (<30 min meta)
+- [x] Implementar auditoria: log de todas as ações financeiras
+- [x] Testes de isolamento multi-tenant
 
 ---
 
@@ -362,7 +362,7 @@
 | Módulo | Total Tarefas | Concluídas | % |
 |---|---|---|---|
 | Fase 0 — Setup | 21 | 21 | 100% |
-| Fase 1 — Auth & Tenancy | 16 | 10 | 63% |
+| Fase 1 — Auth & Tenancy | 17 | 17 | 100% |
 | Módulo 1 — Cadastros | 45 | 0 | 0% |
 | Módulo 2 — Sessões | 20 | 0 | 0% |
 | Módulo 3 — Financeiro | 24 | 0 | 0% |
@@ -371,8 +371,8 @@
 | Módulo 6 — Documentos | 14 | 0 | 0% |
 | Módulo 7 — Relatórios B.I. | 27 | 0 | 0% |
 | Fase Final — Qualidade & Deploy | 19 | 0 | 0% |
-| **TOTAL** | **218** | **31** | **14%** |
+| **TOTAL** | **219** | **38** | **17%** |
 
 ---
 
-*Atualizado em: 2026-03-22*
+*Atualizado em: 2026-03-24*

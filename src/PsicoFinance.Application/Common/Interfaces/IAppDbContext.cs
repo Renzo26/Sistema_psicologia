@@ -12,5 +12,6 @@ public interface IAppDbContext
     DbSet<Paciente> Pacientes { get; }
     DbSet<Contrato> Contratos { get; }
     DbSet<PlanoConta> PlanosConta { get; }
+    DbSet<AuditLog> AuditLogs { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
