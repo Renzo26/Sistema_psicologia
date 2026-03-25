@@ -70,13 +70,13 @@
 ## MÓDULO 1 — Cadastros
 
 ### 1.1 — Clínica
-- [ ] Criar entidade `Clinica` (nome, CNPJ, endereço, telefone, email)
-- [ ] Command: `CriarClinicaCommand` + Handler + Validator
-- [ ] Command: `AtualizarClinicaCommand` + Handler + Validator
-- [ ] Query: `ObterClinicaQuery` + Handler
-- [ ] Endpoint REST: `POST /clinicas`, `PUT /clinicas/{id}`, `GET /clinicas/{id}`
-- [ ] Tela de cadastro/edição de clínica no Angular
-- [ ] Testes unitários e de integração
+- [x] Criar entidade `Clinica` (nome, CNPJ, endereço, telefone, email)
+- [x] Command: `CriarClinicaCommand` + Handler + Validator
+- [x] Command: `AtualizarClinicaCommand` + Handler + Validator
+- [x] Query: `ObterClinicaQuery` + Handler
+- [x] Endpoint REST: `POST /clinicas`, `PUT /clinicas/minha`, `GET /clinicas/minha`
+- [x] Tela de cadastro/edição de clínica no Angular
+- [x] Testes unitários e de integração (32 testes aprovados)
 
 ### 1.2 — Psicólogos
 - [ ] Criar entidade `Psicologo` (nome, CRP, tipo PJ/CLT, percentual ou valor fixo repasse)
@@ -363,7 +363,7 @@
 |---|---|---|---|
 | Fase 0 — Setup | 21 | 21 | 100% |
 | Fase 1 — Auth & Tenancy | 17 | 17 | 100% |
-| Módulo 1 — Cadastros | 45 | 0 | 0% |
+| Módulo 1 — Cadastros | 45 | 7 | 16% |
 | Módulo 2 — Sessões | 20 | 0 | 0% |
 | Módulo 3 — Financeiro | 24 | 0 | 0% |
 | Módulo 4 — Automações N8N | 16 | 0 | 0% |
@@ -371,7 +371,7 @@
 | Módulo 6 — Documentos | 14 | 0 | 0% |
 | Módulo 7 — Relatórios B.I. | 27 | 0 | 0% |
 | Fase Final — Qualidade & Deploy | 19 | 0 | 0% |
-| **TOTAL** | **219** | **38** | **17%** |
+| **TOTAL** | **219** | **45** | **21%** |
 
 ---
 

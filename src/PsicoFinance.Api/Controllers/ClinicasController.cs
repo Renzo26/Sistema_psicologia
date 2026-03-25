@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PsicoFinance.Application.Features.Clinicas.Commands.AtualizarClinica;
+using PsicoFinance.Application.Features.Clinicas.Commands.CriarClinica;
 using PsicoFinance.Application.Features.Clinicas.DTOs;
 using PsicoFinance.Application.Features.Clinicas.Queries.ObterClinica;
 
@@ -15,6 +16,35 @@ public class ClinicasController : ControllerBase
     private readonly ISender _mediator;
 
     public ClinicasController(ISender mediator) => _mediator = mediator;
+
+    /// <summary>
+    /// Cria uma nova clínica (Admin).
+    /// </summary>
+    [HttpPost]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(typeof(ClinicaDto), 201)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(409)]
+    public async Task<IActionResult> Criar(
+        [FromBody] CriarClinicaRequest request,
+        CancellationToken ct)
+    {
+        var command = new CriarClinicaCommand(
+            request.Nome,
+            request.Cnpj,
+            request.Email,
+            request.Telefone,
+            request.Cep,
+            request.Logradouro,
+            request.Numero,
+            request.Complemento,
+            request.Bairro,
+            request.Cidade,
+            request.Estado);
+
+        var result = await _mediator.Send(command, ct);
+        return CreatedAtAction(nameof(ObterMinha), new { }, result);
+    }
 
     /// <summary>
     /// Obtém os dados da clínica do tenant atual.
@@ -59,6 +89,19 @@ public class ClinicasController : ControllerBase
         return Ok(result);
     }
 }
+
+public record CriarClinicaRequest(
+    string Nome,
+    string? Cnpj,
+    string Email,
+    string? Telefone,
+    string? Cep,
+    string? Logradouro,
+    string? Numero,
+    string? Complemento,
+    string? Bairro,
+    string? Cidade,
+    string? Estado);
 
 public record AtualizarClinicaRequest(
     string Nome,
