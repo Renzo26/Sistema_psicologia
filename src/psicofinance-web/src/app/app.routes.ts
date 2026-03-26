@@ -21,6 +21,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'cadastros',
+        loadChildren: () =>
+          import('./features/cadastros/cadastros.routes').then(
+            (m) => m.CADASTROS_ROUTES
+          ),
+      },
+      {
         path: 'configuracoes',
         loadChildren: () =>
           import('./features/configuracoes/configuracoes.routes').then(

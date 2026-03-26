@@ -9,6 +9,7 @@ using PsicoFinance.Infrastructure.MultiTenancy;
 using PsicoFinance.Infrastructure.Persistence;
 using PsicoFinance.Infrastructure.Services.Audit;
 using PsicoFinance.Infrastructure.Services.Auth;
+using PsicoFinance.Infrastructure.Services.Encryption;
 
 namespace PsicoFinance.Infrastructure;
 
@@ -69,6 +70,9 @@ public static class DependencyInjection
 
         // ── Audit ──────────────────────────────────────────────────
         services.AddScoped<IAuditService, AuditService>();
+
+        // ── Encryption (LGPD) ─────────────────────────────────────
+        services.AddSingleton<IEncryptionService, AesEncryptionService>();
 
         return services;
     }

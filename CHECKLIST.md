@@ -79,29 +79,29 @@
 - [x] Testes unitários e de integração (32 testes aprovados)
 
 ### 1.2 — Psicólogos
-- [ ] Criar entidade `Psicologo` (nome, CRP, tipo PJ/CLT, percentual ou valor fixo repasse)
-- [ ] Command: `CriarPsicologoCommand` + Handler + Validator
-- [ ] Command: `AtualizarPsicologoCommand` + Handler + Validator
-- [ ] Command: `InativarPsicologoCommand` + Handler
-- [ ] Query: `ListarPsicologosQuery` + Handler (com filtros)
-- [ ] Query: `ObterPsicologoQuery` + Handler
-- [ ] Endpoints REST: CRUD completo `/psicologos`
-- [ ] Tela de listagem de psicólogos no Angular
-- [ ] Tela de cadastro/edição de psicólogo no Angular
-- [ ] Testes unitários e de integração
+- [x] Criar entidade `Psicologo` (nome, CRP, tipo PJ/CLT, percentual ou valor fixo repasse)
+- [x] Command: `CriarPsicologoCommand` + Handler + Validator
+- [x] Command: `AtualizarPsicologoCommand` + Handler + Validator
+- [x] Command: `InativarPsicologoCommand` + Handler
+- [x] Query: `ListarPsicologosQuery` + Handler (com filtros)
+- [x] Query: `ObterPsicologoQuery` + Handler
+- [x] Endpoints REST: CRUD completo `/psicologos`
+- [x] Tela de listagem de psicólogos no Angular
+- [x] Tela de cadastro/edição de psicólogo no Angular
+- [x] Testes unitários e de integração (100 testes aprovados)
 
 ### 1.3 — Pacientes
-- [ ] Criar entidade `Paciente` (nome, CPF, email, telefone, data nascimento)
-- [ ] Implementar criptografia de dados sensíveis (LGPD)
-- [ ] Command: `CriarPacienteCommand` + Handler + Validator
-- [ ] Command: `AtualizarPacienteCommand` + Handler + Validator
-- [ ] Command: `InativarPacienteCommand` + Handler
-- [ ] Query: `ListarPacientesQuery` + Handler (com busca/filtros)
-- [ ] Query: `ObterPacienteQuery` + Handler
-- [ ] Endpoints REST: CRUD completo `/pacientes`
-- [ ] Tela de listagem de pacientes no Angular
-- [ ] Tela de cadastro/edição de paciente no Angular
-- [ ] Testes unitários e de integração
+- [x] Criar entidade `Paciente` (nome, CPF, email, telefone, data nascimento)
+- [x] Implementar criptografia de dados sensíveis (LGPD) — AES-256 via IEncryptionService
+- [x] Command: `CriarPacienteCommand` + Handler + Validator
+- [x] Command: `AtualizarPacienteCommand` + Handler + Validator
+- [x] Command: `InativarPacienteCommand` + Handler
+- [x] Query: `ListarPacientesQuery` + Handler (com busca/filtros)
+- [x] Query: `ObterPacienteQuery` + Handler
+- [x] Endpoints REST: CRUD completo `/pacientes`
+- [x] Tela de listagem de pacientes no Angular
+- [x] Tela de cadastro/edição de paciente no Angular
+- [x] Testes unitários e de integração (100 testes aprovados)
 
 ### 1.4 — Contratos
 - [ ] Criar entidade `Contrato` (paciente, psicólogo, valor sessão, dia semana, frequência, forma pgto)
