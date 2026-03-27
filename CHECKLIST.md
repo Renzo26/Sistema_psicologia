@@ -104,19 +104,19 @@
 - [x] Testes unitários e de integração (100 testes aprovados)
 
 ### 1.4 — Contratos
-- [ ] Criar entidade `Contrato` (paciente, psicólogo, valor sessão, dia semana, frequência, forma pgto)
-- [ ] Criar enum `StatusContrato` (Ativo, Pausado, Encerrado)
-- [ ] Criar enum `FormaPagamento` (PIX, Cartão, Dinheiro, Convênio)
-- [ ] Criar enum `FrequenciaContrato` (Semanal, Quinzenal)
-- [ ] Command: `CriarContratoCommand` + Handler + Validator
-- [ ] Command: `AtualizarContratoCommand` + Handler + Validator
-- [ ] Command: `EncerrarContratoCommand` + Handler
-- [ ] Query: `ListarContratosQuery` + Handler
-- [ ] Query: `ObterContratoQuery` + Handler
-- [ ] Endpoints REST: CRUD completo `/contratos`
-- [ ] Tela de listagem de contratos no Angular
-- [ ] Tela de cadastro/edição de contrato no Angular
-- [ ] Testes unitários e de integração
+- [x] Criar entidade `Contrato` (paciente, psicólogo, valor sessão, dia semana, frequência, forma pgto)
+- [x] Criar enum `StatusContrato` (Ativo, Pausado, Encerrado)
+- [x] Criar enum `FormaPagamento` (PIX, Cartão, Dinheiro, Convênio)
+- [x] Criar enum `FrequenciaContrato` (Semanal, Quinzenal)
+- [x] Command: `CriarContratoCommand` + Handler + Validator
+- [x] Command: `AtualizarContratoCommand` + Handler + Validator
+- [x] Command: `EncerrarContratoCommand` + Handler
+- [x] Query: `ListarContratosQuery` + Handler
+- [x] Query: `ObterContratoQuery` + Handler
+- [x] Endpoints REST: CRUD completo `/contratos`
+- [x] Tela de listagem de contratos no Angular
+- [x] Tela de cadastro/edição de contrato no Angular
+- [x] Testes unitários e de integração (119 testes aprovados)
 
 ### 1.5 — Planos de Conta (Financeiro)
 - [ ] Criar entidade `PlanoConta` (nome, tipo Receita/Despesa, categoria)

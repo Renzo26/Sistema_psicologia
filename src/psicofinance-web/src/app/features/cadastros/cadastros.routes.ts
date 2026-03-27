@@ -43,5 +43,26 @@ export const CADASTROS_ROUTES: Routes = [
         (m) => m.PacienteFormComponent
       ),
   },
+  {
+    path: 'contratos',
+    loadComponent: () =>
+      import('./contratos/contratos-list.component').then(
+        (m) => m.ContratosListComponent
+      ),
+  },
+  {
+    path: 'contratos/novo',
+    loadComponent: () =>
+      import('./contratos/contrato-form.component').then(
+        (m) => m.ContratoFormComponent
+      ),
+  },
+  {
+    path: 'contratos/:id',
+    loadComponent: () =>
+      import('./contratos/contrato-form.component').then(
+        (m) => m.ContratoFormComponent
+      ),
+  },
   { path: '', redirectTo: 'psicologos', pathMatch: 'full' },
 ];
