@@ -129,33 +129,33 @@
 ## MÓDULO 2 — Sessões
 
 ### 2.1 — Agendamento de Sessões
-- [ ] Criar entidade `Sessao` (contrato, data, hora, psicólogo, paciente, status)
-- [ ] Criar enum `StatusSessao` (Agendada, Realizada, Falta, FaltaJustificada, Cancelada)
-- [ ] Regra: sessão só pode mudar status dentro de 30 dias (exceto Admin)
-- [ ] Command: `AgendarSessaoCommand` + Handler + Validator
-- [ ] Command: `AtualizarSessaoCommand` + Handler + Validator
-- [ ] Command: `CancelarSessaoCommand` + Handler
+- [x] Criar entidade `Sessao` (contrato, data, hora, psicólogo, paciente, status)
+- [x] Criar enum `StatusSessao` (Agendada, Realizada, Falta, FaltaJustificada, Cancelada)
+- [x] Regra: sessão só pode mudar status dentro de 30 dias (exceto Admin)
+- [x] Command: `AgendarSessaoCommand` + Handler + Validator
+- [x] Command: `AtualizarSessaoCommand` + Handler + Validator
+- [x] Command: `CancelarSessaoCommand` + Handler
 
 ### 2.2 — Recorrência Semanal/Quinzenal
-- [ ] Implementar `GerarSessoesRecorrentesCommand` (a partir do contrato)
-- [ ] Serviço de domínio: calcular próximas N sessões com base na frequência
+- [x] Implementar `GerarSessoesRecorrentesCommand` (a partir do contrato)
+- [x] Serviço de domínio: calcular próximas N sessões com base na frequência
 - [ ] Hangfire job: gerar sessões do mês seguinte automaticamente
 - [ ] Regra: ao gerar sessão, criar lançamento financeiro com status `Previsto`
 
 ### 2.3 — Controle de Frequência
-- [ ] Command: `MarcarPresencaCommand` + Handler
-- [ ] Command: `RegistrarFaltaCommand` (justificada/não justificada) + Handler
-- [ ] Regra de negócio: falta justificada não gera cobrança (configurável por contrato)
-- [ ] Query: `ListarSessoesQuery` + Handler (filtros: data, psicólogo, paciente, status)
-- [ ] Query: `ObterSessaoQuery` + Handler
+- [x] Command: `MarcarPresencaCommand` + Handler
+- [x] Command: `RegistrarFaltaCommand` (justificada/não justificada) + Handler
+- [x] Regra de negócio: falta justificada não gera cobrança (configurável por contrato)
+- [x] Query: `ListarSessoesQuery` + Handler (filtros: data, psicólogo, paciente, status)
+- [x] Query: `ObterSessaoQuery` + Handler
 
 ### 2.4 — Endpoints & Frontend
-- [ ] Endpoints REST: `/sessoes` CRUD completo
-- [ ] Endpoint: `POST /sessoes/gerar-recorrentes`
-- [ ] Tela de agenda/calendário de sessões no Angular
-- [ ] Tela de listagem de sessões com filtros no Angular
-- [ ] Marcação de presença/falta inline na listagem
-- [ ] Testes unitários e de integração (regras de recorrência e status)
+- [x] Endpoints REST: `/sessoes` CRUD completo
+- [x] Endpoint: `POST /sessoes/gerar-recorrentes`
+- [x] Tela de agenda/calendário de sessões no Angular
+- [x] Tela de listagem de sessões com filtros no Angular
+- [x] Marcação de presença/falta inline na listagem
+- [x] Testes unitários e de integração (regras de recorrência e status)
 
 ---
 
@@ -364,15 +364,15 @@
 | Fase 0 — Setup | 21 | 21 | 100% |
 | Fase 1 — Auth & Tenancy | 17 | 17 | 100% |
 | Módulo 1 — Cadastros | 45 | 7 | 16% |
-| Módulo 2 — Sessões | 20 | 0 | 0% |
+| Módulo 2 — Sessões | 20 | 18 | 90% |
 | Módulo 3 — Financeiro | 24 | 0 | 0% |
 | Módulo 4 — Automações N8N | 16 | 0 | 0% |
 | Módulo 5 — Dashboard | 16 | 0 | 0% |
 | Módulo 6 — Documentos | 14 | 0 | 0% |
 | Módulo 7 — Relatórios B.I. | 27 | 0 | 0% |
 | Fase Final — Qualidade & Deploy | 19 | 0 | 0% |
-| **TOTAL** | **219** | **45** | **21%** |
+| **TOTAL** | **219** | **63** | **29%** |
 
 ---
 
-*Atualizado em: 2026-03-24*
+*Atualizado em: 2026-03-30*

@@ -20,6 +20,12 @@ public class TenantMiddleware
         if (!string.IsNullOrEmpty(clinicaIdClaim) && Guid.TryParse(clinicaIdClaim, out var clinicaId))
         {
             tenantProvider.SetClinicaId(clinicaId);
+
+            var role = context.User.FindFirstValue(ClaimTypes.Role)
+                    ?? context.User.FindFirstValue("role");
+            if (!string.IsNullOrEmpty(role))
+                tenantProvider.SetUserRole(role);
+
             await _next(context);
             return;
         }

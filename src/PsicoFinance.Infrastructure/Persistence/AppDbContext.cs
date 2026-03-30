@@ -23,6 +23,7 @@ public class AppDbContext : DbContext, IAppDbContext
     public DbSet<Paciente> Pacientes => Set<Paciente>();
     public DbSet<PlanoConta> PlanosConta => Set<PlanoConta>();
     public DbSet<Contrato> Contratos => Set<Contrato>();
+    public DbSet<Sessao> Sessoes => Set<Sessao>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

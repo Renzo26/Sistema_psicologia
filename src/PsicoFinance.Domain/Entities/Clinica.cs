@@ -27,4 +27,5 @@ public class Clinica : BaseEntity
     public ICollection<Paciente> Pacientes { get; set; } = [];
     public ICollection<Contrato> Contratos { get; set; } = [];
     public ICollection<PlanoConta> PlanosConta { get; set; } = [];
+    public ICollection<Sessao> Sessoes { get; set; } = [];
 }

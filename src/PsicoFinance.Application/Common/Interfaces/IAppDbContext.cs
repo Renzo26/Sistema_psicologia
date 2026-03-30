@@ -11,6 +11,7 @@ public interface IAppDbContext
     DbSet<Psicologo> Psicologos { get; }
     DbSet<Paciente> Pacientes { get; }
     DbSet<Contrato> Contratos { get; }
+    DbSet<Sessao> Sessoes { get; }
     DbSet<PlanoConta> PlanosConta { get; }
     DbSet<AuditLog> AuditLogs { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

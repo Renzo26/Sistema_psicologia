@@ -28,6 +28,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'sessoes',
+        loadChildren: () =>
+          import('./features/sessoes/sessoes.routes').then(
+            (m) => m.SESSOES_ROUTES
+          ),
+      },
+      {
         path: 'configuracoes',
         loadChildren: () =>
           import('./features/configuracoes/configuracoes.routes').then(
