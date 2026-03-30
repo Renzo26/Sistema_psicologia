@@ -13,6 +13,8 @@ public interface IAppDbContext
     DbSet<Contrato> Contratos { get; }
     DbSet<Sessao> Sessoes { get; }
     DbSet<PlanoConta> PlanosConta { get; }
+    DbSet<LancamentoFinanceiro> LancamentosFinanceiros { get; }
+    DbSet<Repasse> Repasses { get; }
     DbSet<AuditLog> AuditLogs { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

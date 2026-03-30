@@ -119,10 +119,10 @@
 - [x] Testes unitários e de integração (119 testes aprovados)
 
 ### 1.5 — Planos de Conta (Financeiro)
-- [ ] Criar entidade `PlanoConta` (nome, tipo Receita/Despesa, categoria)
-- [ ] CRUD completo + endpoints REST
-- [ ] Tela de gestão de planos de conta no Angular
-- [ ] Testes unitários
+- [x] Criar entidade `PlanoConta` (nome, tipo Receita/Despesa, categoria)
+- [x] CRUD completo + endpoints REST (`GET`, `GET /{id}`, `POST`, `PUT /{id}`, `DELETE /{id}`)
+- [x] Tela de gestão de planos de conta no Angular (listagem + modal criar/editar)
+- [x] Testes unitários (10 testes aprovados)
 
 ---
 
@@ -162,24 +162,24 @@
 ## MÓDULO 3 — Financeiro
 
 ### 3.1 — Lançamentos Financeiros
-- [ ] Criar entidade `LancamentoFinanceiro` (descrição, valor, tipo, status, vencimento, competência)
-- [ ] Criar enum `TipoLancamento` (Receita, Despesa)
-- [ ] Criar enum `StatusLancamento` (Previsto, Confirmado, Cancelado)
+- [x] Criar entidade `LancamentoFinanceiro` (descrição, valor, tipo, status, vencimento, competência)
+- [x] Criar enum `TipoLancamento` (Receita, Despesa)
+- [x] Criar enum `StatusLancamento` (Previsto, Confirmado, Cancelado)
 - [ ] Criar Domain Event: `SessaoRealizadaEvent` → confirmar lançamento
 - [ ] Criar Domain Event: `SessaoCanceladaEvent` → cancelar lançamento
-- [ ] Command: `CriarLancamentoCommand` + Handler + Validator
-- [ ] Command: `AtualizarLancamentoCommand` + Handler + Validator
-- [ ] Command: `ConfirmarPagamentoCommand` + Handler
-- [ ] Command: `CancelarLancamentoCommand` + Handler
-- [ ] Query: `ListarLancamentosQuery` + Handler (filtros: período, tipo, status)
-- [ ] Query: `ObterFluxoCaixaQuery` (diário/semanal/mensal, previsto vs realizado)
+- [x] Command: `CriarLancamentoCommand` + Handler + Validator
+- [x] Command: `AtualizarLancamentoCommand` + Handler + Validator
+- [x] Command: `ConfirmarPagamentoCommand` + Handler
+- [x] Command: `CancelarLancamentoCommand` + Handler
+- [x] Query: `ListarLancamentosQuery` + Handler (filtros: período, tipo, status)
+- [x] Query: `ObterFluxoCaixaQuery` (diário/semanal/mensal, previsto vs realizado)
 
 ### 3.2 — Repasses para Psicólogos PJ
-- [ ] Serviço de domínio: `CalcularRepasseService` (percentual ou valor fixo)
-- [ ] Command: `GerarRepasseMensalCommand` + Handler
-- [ ] Criar entidade `Repasse` (psicólogo, mês, valor calculado, status)
-- [ ] Endpoint: `POST /repasses/calcular`
-- [ ] Query: `ListarRepassesQuery` + Handler
+- [x] Serviço de domínio: `CalcularRepasseService` (percentual ou valor fixo)
+- [x] Command: `GerarRepasseMensalCommand` + Handler
+- [x] Criar entidade `Repasse` (psicólogo, mês, valor calculado, status)
+- [x] Endpoint: `POST /repasses/calcular`
+- [x] Query: `ListarRepassesQuery` + Handler
 
 ### 3.3 — Fechamento Mensal
 - [ ] Command: `RealizarFechamentoMensalCommand` + Handler
@@ -190,13 +190,14 @@
 - [ ] Query: `ObterFechamentoQuery` + Handler
 
 ### 3.4 — Endpoints & Frontend
-- [ ] Endpoints REST: `/lancamentos` CRUD completo
-- [ ] Endpoints REST: `/repasses`, `/fechamentos`
-- [ ] Tela de lançamentos financeiros com filtros no Angular
+- [x] Endpoints REST: `/lancamentos` CRUD completo
+- [x] Endpoints REST: `/repasses` (CRUD + pagar)
+- [ ] Endpoints REST: `/fechamentos`
+- [x] Tela de lançamentos financeiros com filtros no Angular
 - [ ] Tela de fluxo de caixa (gráficos diário/mensal) no Angular
-- [ ] Tela de repasses por psicólogo no Angular
+- [x] Tela de repasses por psicólogo no Angular
 - [ ] Tela de fechamento mensal no Angular
-- [ ] Testes unitários e de integração (regras de fechamento, repasse)
+- [x] Testes unitários e de integração (regras de repasse: 6 testes aprovados)
 
 ---
 

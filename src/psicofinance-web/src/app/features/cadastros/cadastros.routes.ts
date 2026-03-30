@@ -64,5 +64,12 @@ export const CADASTROS_ROUTES: Routes = [
         (m) => m.ContratoFormComponent
       ),
   },
+  {
+    path: 'planos-conta',
+    loadComponent: () =>
+      import('./planos-conta/planos-conta.component').then(
+        (m) => m.PlanosContaComponent
+      ),
+  },
   { path: '', redirectTo: 'psicologos', pathMatch: 'full' },
 ];

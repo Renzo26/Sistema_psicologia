@@ -61,7 +61,8 @@ public class RegistrarFaltaCommandHandlerTests
     [Fact]
     public async Task Handle_SessaoCancelada_LancaInvalidOperation()
     {
-        var sessao = SessaoAgendada() with { Status = StatusSessao.Cancelada };
+        var sessao = SessaoAgendada();
+        sessao.Status = StatusSessao.Cancelada;
         var (ctx, tp) = SetupContext(sessao);
         var handler = new RegistrarFaltaCommandHandler(ctx, tp);
 

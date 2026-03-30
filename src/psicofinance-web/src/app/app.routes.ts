@@ -35,6 +35,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'financeiro',
+        loadChildren: () =>
+          import('./features/financeiro/financeiro.routes').then(
+            (m) => m.FINANCEIRO_ROUTES
+          ),
+      },
+      {
         path: 'configuracoes',
         loadChildren: () =>
           import('./features/configuracoes/configuracoes.routes').then(

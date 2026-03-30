@@ -47,7 +47,8 @@ public class MarcarPresencaCommandHandlerTests
     [Fact]
     public async Task Handle_SessaoJaRealizada_LancaInvalidOperation()
     {
-        var sessao = SessaoAgendada() with { Status = StatusSessao.Realizada };
+        var sessao = SessaoAgendada();
+        sessao.Status = StatusSessao.Realizada;
         var (ctx, tp) = SetupContext(sessao);
         var handler = new MarcarPresencaCommandHandler(ctx, tp);
 
@@ -59,7 +60,8 @@ public class MarcarPresencaCommandHandlerTests
     [Fact]
     public async Task Handle_SessaoCancelada_LancaInvalidOperation()
     {
-        var sessao = SessaoAgendada() with { Status = StatusSessao.Cancelada };
+        var sessao = SessaoAgendada();
+        sessao.Status = StatusSessao.Cancelada;
         var (ctx, tp) = SetupContext(sessao);
         var handler = new MarcarPresencaCommandHandler(ctx, tp);
 

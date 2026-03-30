@@ -24,6 +24,8 @@ public class AppDbContext : DbContext, IAppDbContext
     public DbSet<PlanoConta> PlanosConta => Set<PlanoConta>();
     public DbSet<Contrato> Contratos => Set<Contrato>();
     public DbSet<Sessao> Sessoes => Set<Sessao>();
+    public DbSet<LancamentoFinanceiro> LancamentosFinanceiros => Set<LancamentoFinanceiro>();
+    public DbSet<Repasse> Repasses => Set<Repasse>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
