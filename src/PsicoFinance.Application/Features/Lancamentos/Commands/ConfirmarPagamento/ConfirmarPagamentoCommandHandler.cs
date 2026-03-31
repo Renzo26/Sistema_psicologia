@@ -33,6 +33,12 @@ public class ConfirmarPagamentoCommandHandler : IRequestHandler<ConfirmarPagamen
         if (lancamento.Status == StatusLancamento.Confirmado)
             throw new InvalidOperationException("Lançamento já está confirmado.");
 
+        var periodoFechado = await _context.FechamentosMensais
+            .AnyAsync(f => f.MesReferencia == lancamento.Competencia
+                        && f.Status == StatusFechamento.Fechado, cancellationToken);
+        if (periodoFechado)
+            throw new InvalidOperationException($"O período {lancamento.Competencia} está fechado e não permite edições.");
+
         lancamento.Status = StatusLancamento.Confirmado;
         lancamento.DataPagamento = request.DataPagamento;
 

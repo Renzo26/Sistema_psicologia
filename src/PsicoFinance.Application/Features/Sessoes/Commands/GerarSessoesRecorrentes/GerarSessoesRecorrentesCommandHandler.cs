@@ -72,6 +72,26 @@ public class GerarSessoesRecorrentesCommandHandler
             return [];
 
         _context.Sessoes.AddRange(novasSessoes);
+
+        // Se o contrato tiver plano de conta, gera lançamento Previsto para cada sessão
+        if (contrato.PlanoContaId.HasValue)
+        {
+            var lancamentos = novasSessoes.Select(s => new LancamentoFinanceiro
+            {
+                Id = Guid.NewGuid(),
+                ClinicaId = clinicaId,
+                Descricao = $"Sessão - {contrato.Paciente.Nome} - {s.Data:dd/MM/yyyy}",
+                Valor = contrato.ValorSessao,
+                Tipo = TipoLancamento.Receita,
+                Status = StatusLancamento.Previsto,
+                DataVencimento = s.Data,
+                Competencia = s.Data.ToString("yyyy-MM"),
+                PlanoContaId = contrato.PlanoContaId.Value,
+                SessaoId = s.Id,
+            });
+            _context.LancamentosFinanceiros.AddRange(lancamentos);
+        }
+
         await _context.SaveChangesAsync(cancellationToken);
 
         return novasSessoes

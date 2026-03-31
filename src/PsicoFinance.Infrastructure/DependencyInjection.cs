@@ -1,10 +1,13 @@
 using System.Text;
+using Hangfire;
+using Hangfire.PostgreSql;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using PsicoFinance.Application.Common.Interfaces;
+using PsicoFinance.Infrastructure.Jobs;
 using PsicoFinance.Infrastructure.MultiTenancy;
 using PsicoFinance.Infrastructure.Persistence;
 using PsicoFinance.Infrastructure.Services.Audit;
@@ -73,6 +76,17 @@ public static class DependencyInjection
 
         // ── Encryption (LGPD) ─────────────────────────────────────
         services.AddSingleton<IEncryptionService, AesEncryptionService>();
+
+        // ── Hangfire ──────────────────────────────────────────────
+        var connectionString = configuration.GetConnectionString("DefaultConnection")!;
+        services.AddHangfire(config => config
+            .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+            .UseSimpleAssemblyNameTypeSerializer()
+            .UseRecommendedSerializerSettings()
+            .UsePostgreSqlStorage(opts => opts.UseNpgsqlConnection(connectionString)));
+
+        services.AddHangfireServer();
+        services.AddSingleton<GerarSessoesMesSeguinteJob>();
 
         return services;
     }

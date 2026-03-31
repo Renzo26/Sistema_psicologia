@@ -15,6 +15,7 @@ public interface IAppDbContext
     DbSet<PlanoConta> PlanosConta { get; }
     DbSet<LancamentoFinanceiro> LancamentosFinanceiros { get; }
     DbSet<Repasse> Repasses { get; }
+    DbSet<FechamentoMensal> FechamentosMensais { get; }
     DbSet<AuditLog> AuditLogs { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

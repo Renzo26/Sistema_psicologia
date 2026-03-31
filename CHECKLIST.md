@@ -139,8 +139,8 @@
 ### 2.2 — Recorrência Semanal/Quinzenal
 - [x] Implementar `GerarSessoesRecorrentesCommand` (a partir do contrato)
 - [x] Serviço de domínio: calcular próximas N sessões com base na frequência
-- [ ] Hangfire job: gerar sessões do mês seguinte automaticamente
-- [ ] Regra: ao gerar sessão, criar lançamento financeiro com status `Previsto`
+- [x] Hangfire job: gerar sessões do mês seguinte automaticamente (`GerarSessoesMesSeguinteJob`)
+- [x] Regra: ao gerar sessão, criar lançamento financeiro com status `Previsto`
 
 ### 2.3 — Controle de Frequência
 - [x] Command: `MarcarPresencaCommand` + Handler
@@ -165,8 +165,8 @@
 - [x] Criar entidade `LancamentoFinanceiro` (descrição, valor, tipo, status, vencimento, competência)
 - [x] Criar enum `TipoLancamento` (Receita, Despesa)
 - [x] Criar enum `StatusLancamento` (Previsto, Confirmado, Cancelado)
-- [ ] Criar Domain Event: `SessaoRealizadaEvent` → confirmar lançamento
-- [ ] Criar Domain Event: `SessaoCanceladaEvent` → cancelar lançamento
+- [x] Criar Domain Event: `SessaoRealizadaEvent` → confirmar lançamento
+- [x] Criar Domain Event: `SessaoCanceladaEvent` → cancelar lançamento
 - [x] Command: `CriarLancamentoCommand` + Handler + Validator
 - [x] Command: `AtualizarLancamentoCommand` + Handler + Validator
 - [x] Command: `ConfirmarPagamentoCommand` + Handler
@@ -182,21 +182,22 @@
 - [x] Query: `ListarRepassesQuery` + Handler
 
 ### 3.3 — Fechamento Mensal
-- [ ] Command: `RealizarFechamentoMensalCommand` + Handler
-- [ ] Regra: período fechado não permite edições de lançamentos
-- [ ] Criar entidade `FechamentoMensal` (mês, totais, status)
-- [ ] Gerar relatório consolidado por psicólogo no fechamento
-- [ ] Endpoint: `POST /fechamentos`
-- [ ] Query: `ObterFechamentoQuery` + Handler
+- [x] Command: `RealizarFechamentoMensalCommand` + Handler
+- [x] Regra: período fechado não permite edições de lançamentos
+- [x] Criar entidade `FechamentoMensal` (mês, totais, status)
+- [x] Gerar relatório consolidado por psicólogo no fechamento
+- [x] Endpoint: `POST /fechamentos`
+- [x] Query: `ObterFechamentoQuery` + Handler
+- [x] Query: `ListarFechamentosQuery` + Handler
 
 ### 3.4 — Endpoints & Frontend
 - [x] Endpoints REST: `/lancamentos` CRUD completo
 - [x] Endpoints REST: `/repasses` (CRUD + pagar)
-- [ ] Endpoints REST: `/fechamentos`
+- [x] Endpoints REST: `/fechamentos`
 - [x] Tela de lançamentos financeiros com filtros no Angular
-- [ ] Tela de fluxo de caixa (gráficos diário/mensal) no Angular
+- [x] Tela de fluxo de caixa (visão diária/mensal, previsto vs realizado) no Angular
 - [x] Tela de repasses por psicólogo no Angular
-- [ ] Tela de fechamento mensal no Angular
+- [x] Tela de fechamento mensal no Angular
 - [x] Testes unitários e de integração (regras de repasse: 6 testes aprovados)
 
 ---
@@ -364,16 +365,16 @@
 |---|---|---|---|
 | Fase 0 — Setup | 21 | 21 | 100% |
 | Fase 1 — Auth & Tenancy | 17 | 17 | 100% |
-| Módulo 1 — Cadastros | 45 | 7 | 16% |
-| Módulo 2 — Sessões | 20 | 18 | 90% |
-| Módulo 3 — Financeiro | 24 | 0 | 0% |
+| Módulo 1 — Cadastros | 45 | 45 | 100% |
+| Módulo 2 — Sessões | 20 | 20 | 100% |
+| Módulo 3 — Financeiro | 26 | 26 | 100% |
 | Módulo 4 — Automações N8N | 16 | 0 | 0% |
 | Módulo 5 — Dashboard | 16 | 0 | 0% |
 | Módulo 6 — Documentos | 14 | 0 | 0% |
 | Módulo 7 — Relatórios B.I. | 27 | 0 | 0% |
 | Fase Final — Qualidade & Deploy | 19 | 0 | 0% |
-| **TOTAL** | **219** | **63** | **29%** |
+| **TOTAL** | **221** | **129** | **58%** |
 
 ---
 
-*Atualizado em: 2026-03-30*
+*Atualizado em: 2026-03-31*

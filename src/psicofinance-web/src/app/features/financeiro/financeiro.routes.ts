@@ -15,5 +15,19 @@ export const FINANCEIRO_ROUTES: Routes = [
         (m) => m.RepassesComponent
       ),
   },
+  {
+    path: 'fluxo-caixa',
+    loadComponent: () =>
+      import('./fluxo-caixa/fluxo-caixa.component').then(
+        (m) => m.FluxoCaixaComponent
+      ),
+  },
+  {
+    path: 'fechamento',
+    loadComponent: () =>
+      import('./fechamento/fechamento-mensal.component').then(
+        (m) => m.FechamentoMensalComponent
+      ),
+  },
   { path: '', redirectTo: 'lancamentos', pathMatch: 'full' },
 ];

@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using PsicoFinance.Application.Common.Interfaces;
 using PsicoFinance.Domain.Enums;
+using PsicoFinance.Domain.Events;
 
 namespace PsicoFinance.Application.Features.Sessoes.Commands.MarcarPresenca;
 
@@ -9,11 +10,14 @@ public class MarcarPresencaCommandHandler : IRequestHandler<MarcarPresencaComman
 {
     private readonly IAppDbContext _context;
     private readonly ITenantProvider _tenantProvider;
+    private readonly IPublisher _publisher;
 
-    public MarcarPresencaCommandHandler(IAppDbContext context, ITenantProvider tenantProvider)
+    public MarcarPresencaCommandHandler(
+        IAppDbContext context, ITenantProvider tenantProvider, IPublisher publisher)
     {
         _context = context;
         _tenantProvider = tenantProvider;
+        _publisher = publisher;
     }
 
     public async Task Handle(MarcarPresencaCommand request, CancellationToken cancellationToken)
@@ -37,5 +41,8 @@ public class MarcarPresencaCommandHandler : IRequestHandler<MarcarPresencaComman
         sessao.MotivoFalta = null;
 
         await _context.SaveChangesAsync(cancellationToken);
+
+        await _publisher.Publish(
+            new SessaoRealizadaEvent(sessao.Id, sessao.ClinicaId), cancellationToken);
     }
 }

@@ -1,10 +1,12 @@
 using System.Threading.RateLimiting;
 using FluentValidation;
+using Hangfire;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.RateLimiting;
 using PsicoFinance.Api.Middleware;
 using PsicoFinance.Application;
 using PsicoFinance.Infrastructure;
+using PsicoFinance.Infrastructure.Jobs;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -143,5 +145,16 @@ app.UseAuthentication();
 app.UseMiddleware<TenantMiddleware>();
 app.UseAuthorization();
 app.MapControllers();
+
+// ── Hangfire Dashboard (apenas em desenvolvimento) ────────────
+if (app.Environment.IsDevelopment())
+    app.UseHangfireDashboard("/hangfire");
+
+// ── Jobs recorrentes ──────────────────────────────────────────
+var job = app.Services.GetRequiredService<GerarSessoesMesSeguinteJob>();
+RecurringJob.AddOrUpdate(
+    "gerar-sessoes-mes-seguinte",
+    () => job.ExecuteAsync(),
+    Cron.Monthly(1, 2)); // Dia 1 de cada mês às 02:00
 
 app.Run();

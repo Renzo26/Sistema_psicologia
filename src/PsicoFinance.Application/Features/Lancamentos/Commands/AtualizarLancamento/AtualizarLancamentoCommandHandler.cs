@@ -30,6 +30,12 @@ public class AtualizarLancamentoCommandHandler : IRequestHandler<AtualizarLancam
         if (lancamento.Status == StatusLancamento.Cancelado)
             throw new InvalidOperationException("Não é possível editar um lançamento cancelado.");
 
+        var periodoFechado = await _context.FechamentosMensais
+            .AnyAsync(f => f.MesReferencia == lancamento.Competencia
+                        && f.Status == StatusFechamento.Fechado, cancellationToken);
+        if (periodoFechado)
+            throw new InvalidOperationException($"O período {lancamento.Competencia} está fechado e não permite edições.");
+
         var planoConta = await _context.PlanosConta
             .AsNoTracking()
             .FirstOrDefaultAsync(p => p.Id == request.PlanoContaId, cancellationToken)

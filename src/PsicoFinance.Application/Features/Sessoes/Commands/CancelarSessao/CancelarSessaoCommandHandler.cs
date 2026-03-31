@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using PsicoFinance.Application.Common.Interfaces;
 using PsicoFinance.Domain.Enums;
+using PsicoFinance.Domain.Events;
 
 namespace PsicoFinance.Application.Features.Sessoes.Commands.CancelarSessao;
 
@@ -9,11 +10,14 @@ public class CancelarSessaoCommandHandler : IRequestHandler<CancelarSessaoComman
 {
     private readonly IAppDbContext _context;
     private readonly ITenantProvider _tenantProvider;
+    private readonly IPublisher _publisher;
 
-    public CancelarSessaoCommandHandler(IAppDbContext context, ITenantProvider tenantProvider)
+    public CancelarSessaoCommandHandler(
+        IAppDbContext context, ITenantProvider tenantProvider, IPublisher publisher)
     {
         _context = context;
         _tenantProvider = tenantProvider;
+        _publisher = publisher;
     }
 
     public async Task Handle(CancelarSessaoCommand request, CancellationToken cancellationToken)
@@ -25,7 +29,6 @@ public class CancelarSessaoCommandHandler : IRequestHandler<CancelarSessaoComman
         if (sessao.Status == StatusSessao.Cancelada)
             throw new InvalidOperationException("Sessão já está cancelada.");
 
-        // Regra: só pode alterar status dentro de 30 dias (exceto Admin)
         var isAdmin = _tenantProvider.UserRole == "Admin";
         var limiteDias = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-30));
         if (!isAdmin && sessao.Data < limiteDias)
@@ -35,5 +38,8 @@ public class CancelarSessaoCommandHandler : IRequestHandler<CancelarSessaoComman
         sessao.MotivoFalta = request.Motivo;
 
         await _context.SaveChangesAsync(cancellationToken);
+
+        await _publisher.Publish(
+            new SessaoCanceladaEvent(sessao.Id, sessao.ClinicaId), cancellationToken);
     }
 }
