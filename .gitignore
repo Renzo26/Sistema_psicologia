@@ -6,6 +6,10 @@
 # dotenv files
 .env
 
+# Credenciais locais — nunca commitar
+appsettings.Development.json
+Credencias_conexao_supabase
+
 # User-specific files
 *.rsuser
 *.suo
