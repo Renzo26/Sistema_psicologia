@@ -10,6 +10,13 @@
 appsettings.Development.json
 Credencias_conexao_supabase
 
+# Projetos gerados automaticamente / lixo
+PsicologiaApp.Api/
+PsicologiaApp.slnx
+
+# Configurações locais do Claude Code
+.claude/settings.local.json
+
 # User-specific files
 *.rsuser
 *.suo
