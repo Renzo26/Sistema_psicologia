@@ -17,5 +17,7 @@ public interface IAppDbContext
     DbSet<Repasse> Repasses { get; }
     DbSet<FechamentoMensal> FechamentosMensais { get; }
     DbSet<AuditLog> AuditLogs { get; }
+    DbSet<Recibo> Recibos { get; }
+    DbSet<NotaFiscal> NotasFiscais { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

@@ -13,6 +13,8 @@ using PsicoFinance.Infrastructure.Persistence;
 using PsicoFinance.Infrastructure.Services.Audit;
 using PsicoFinance.Infrastructure.Services.Auth;
 using PsicoFinance.Infrastructure.Services.Encryption;
+using PsicoFinance.Infrastructure.Services.Pdf;
+using PsicoFinance.Infrastructure.Services.Storage;
 
 namespace PsicoFinance.Infrastructure;
 
@@ -76,6 +78,10 @@ public static class DependencyInjection
 
         // ── Encryption (LGPD) ─────────────────────────────────────
         services.AddSingleton<IEncryptionService, AesEncryptionService>();
+
+        // ── PDF & Storage ─────────────────────────────────────────
+        services.AddSingleton<IPdfService, QuestPdfService>();
+        services.AddSingleton<IFileStorageService, LocalFileStorageService>();
 
         // ── Hangfire ──────────────────────────────────────────────
         var connectionString = configuration.GetConnectionString("DefaultConnection")!;
