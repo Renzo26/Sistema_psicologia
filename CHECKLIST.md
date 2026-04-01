@@ -234,28 +234,28 @@
 ## MÓDULO 5 — Dashboard & Métricas
 
 ### 5.1 — KPIs e Cálculos
-- [ ] Query: `ObterKpisDashboardQuery` (período configurável)
-- [ ] KPI: taxa de absenteísmo (faltas / sessões agendadas)
-- [ ] KPI: taxa de inadimplência (previsto não recebido / previsto total)
-- [ ] KPI: ticket médio por sessão
-- [ ] KPI: receita realizada vs projetada (mensal)
-- [ ] KPI: sessões realizadas vs agendadas
-- [ ] KPI: ranking de psicólogos por volume de sessões/receita
+- [x] Query: `ObterKpisDashboardQuery` (período configurável)
+- [x] KPI: taxa de absenteísmo (faltas / sessões agendadas)
+- [x] KPI: taxa de inadimplência (previsto não recebido / previsto total)
+- [x] KPI: ticket médio por sessão
+- [x] KPI: receita realizada vs projetada (mensal)
+- [x] KPI: sessões realizadas vs agendadas
+- [x] KPI: ranking de psicólogos por volume de sessões/receita
 
 ### 5.2 — Relatórios
-- [ ] Query: `RelatorioFluxoCaixaQuery` (exportável)
-- [ ] Query: `RelatorioSessoesPorPeriodoQuery`
-- [ ] Query: `RelatorioRepassesMensaisQuery`
-- [ ] Query: `RelatorioInadimplenciaQuery`
+- [x] Query: `RelatorioFluxoCaixaQuery` (exportável)
+- [x] Query: `RelatorioSessoesPorPeriodoQuery`
+- [x] Query: `RelatorioRepassesMensaisQuery`
+- [x] Query: `RelatorioInadimplenciaQuery`
 
 ### 5.3 — Frontend Dashboard
-- [ ] Tela de Dashboard principal com cards de KPI no Angular
-- [ ] Gráfico de fluxo de caixa (linha) — previsto vs realizado
-- [ ] Gráfico de sessões por status (pizza/barra)
-- [ ] Gráfico de absenteísmo por psicólogo
-- [ ] Tabela de pacientes inadimplentes
-- [ ] Filtros de período (semana/mês/trimestre/custom)
-- [ ] Testes de queries de KPI
+- [x] Tela de Dashboard principal com cards de KPI no Angular
+- [x] Gráfico de fluxo de caixa (linha) — previsto vs realizado
+- [x] Gráfico de sessões por status (pizza/barra)
+- [x] Gráfico de absenteísmo por psicólogo
+- [x] Tabela de pacientes inadimplentes
+- [x] Filtros de período (semana/mês/trimestre/custom)
+- [x] Testes de queries de KPI
 
 ---
 
@@ -369,11 +369,11 @@
 | Módulo 2 — Sessões | 20 | 20 | 100% |
 | Módulo 3 — Financeiro | 26 | 26 | 100% |
 | Módulo 4 — Automações N8N | 16 | 0 | 0% |
-| Módulo 5 — Dashboard | 16 | 0 | 0% |
+| Módulo 5 — Dashboard | 16 | 16 | 100% |
 | Módulo 6 — Documentos | 14 | 0 | 0% |
 | Módulo 7 — Relatórios B.I. | 27 | 0 | 0% |
 | Fase Final — Qualidade & Deploy | 19 | 0 | 0% |
-| **TOTAL** | **221** | **129** | **58%** |
+| **TOTAL** | **221** | **145** | **66%** |
 
 ---
 

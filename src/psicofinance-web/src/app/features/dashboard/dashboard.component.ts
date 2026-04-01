@@ -1,460 +1,513 @@
-import { Component, ChangeDetectionStrategy, signal, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {
+  Component, ChangeDetectionStrategy, inject, signal, computed, OnInit, DestroyRef
+} from '@angular/core';
+import { CommonModule, CurrencyPipe, DatePipe, PercentPipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ApiService } from '../../core/services/api.service';
 
-interface KpiCard {
-  label: string;
-  value: number;
-  prefix: string;
-  suffix: string;
-  change: number;
-  changeLabel: string;
-  type: 'currency' | 'percent' | 'number';
+// ── Interfaces ────────────────────────────────────────────────────
+interface RankingPsicologo {
+  psicologoId: string;
+  nome: string;
+  totalSessoes: number;
+  sessoesRealizadas: number;
+  receitaGerada: number;
+  taxaAbsenteismo: number;
 }
 
-interface BarData {
-  month: string;
-  receita: number;
-  despesa: number;
-  future: boolean;
+interface PacienteInadimplente {
+  pacienteId: string;
+  nome: string;
+  totalLancamentosVencidos: number;
+  valorTotal: number;
+  vencimentoMaisAntigo: string;
 }
 
-interface RecentSession {
-  paciente: string;
-  psicologo: string;
-  data: string;
-  valor: number;
-  status: 'realizada' | 'agendada' | 'faltou' | 'cancelada';
+interface KpisDashboard {
+  competencia: string;
+  receitaPrevista: number;
+  receitaRealizada: number;
+  despesaPrevista: number;
+  despesaRealizada: number;
+  saldoPrevisto: number;
+  saldoRealizado: number;
+  ticketMedio: number;
+  taxaInadimplencia: number;
+  totalSessoesAgendadas: number;
+  totalSessoesRealizadas: number;
+  totalSessoesFalta: number;
+  totalSessoesFaltaJustificada: number;
+  totalSessoesCanceladas: number;
+  taxaAbsenteismo: number;
+  taxaOcupacao: number;
+  rankingPsicologos: RankingPsicologo[];
+  pacientesInadimplentes: PacienteInadimplente[];
 }
 
+interface FluxoMes {
+  competencia: string;
+  receitasConfirmado: number;
+  despesasConfirmado: number;
+  receitasPrevisto: number;
+  despesasPrevisto: number;
+  saldoRealizado: number;
+  saldoPrevisto: number;
+}
+
+type PeriodoFiltro = 'mes' | 'trimestre' | 'semestre' | 'ano';
+
+// ── Component ─────────────────────────────────────────────────────
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule, CurrencyPipe, DatePipe, PercentPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <!-- TOP ROW: 3 KPI Cards -->
-    <div class="dash-top">
-      @for (kpi of kpis(); track kpi.label; let i = $index) {
-        <div class="card card--compact animate-fade-up animate-delay-{{ i + 1 }}">
-          <span class="label-text kpi-label">{{ kpi.label }}</span>
-          @if (kpi.type === 'currency') {
-            <div class="kpi-value">
-              <span class="display-lg">R$ {{ formatNumber(kpi.value) }}</span>
-              <span class="display-lg cents">,{{ getCents(kpi.value) }}</span>
-            </div>
-          } @else if (kpi.type === 'percent') {
-            <div class="kpi-value">
-              <span class="display-lg">{{ kpi.value }}</span>
-              <span class="display-lg cents">%</span>
+    <div class="page-header">
+      <div>
+        <h2 class="heading-lg">Dashboard</h2>
+        <p class="body-text" style="color:var(--color-muted);margin-top:4px">
+          Visão geral — {{ competencia() }}
+        </p>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div class="periodo-tabs">
+          @for (p of periodos; track p.value) {
+            <button class="periodo-tab" [class.active]="periodo() === p.value"
+                    (click)="setPeriodo(p.value)">{{ p.label }}</button>
+          }
+        </div>
+        <input type="month" class="form-control" style="width:150px"
+               [ngModel]="competencia()" (ngModelChange)="onCompetenciaChange($event)" />
+        <button class="btn btn-secondary" (click)="carregar()">↺ Atualizar</button>
+      </div>
+    </div>
+
+    @if (loading()) {
+      <div class="loading-overlay">
+        <div class="loading-spinner-lg"></div>
+      </div>
+    }
+
+    @if (kpis(); as k) {
+      <!-- ── KPI Cards ── -->
+      <div class="kpi-grid">
+        <div class="kpi-card kpi-receita">
+          <span class="kpi-label">Receita realizada</span>
+          <strong class="kpi-value">{{ k.receitaRealizada | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</strong>
+          <span class="kpi-sub">Previsto: {{ k.receitaPrevista | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>
+          <div class="kpi-bar">
+            <div class="kpi-bar-fill kpi-bar-green"
+                 [style.width.%]="k.receitaPrevista > 0 ? (k.receitaRealizada / k.receitaPrevista * 100) : 0"></div>
+          </div>
+        </div>
+
+        <div class="kpi-card kpi-despesa">
+          <span class="kpi-label">Despesa realizada</span>
+          <strong class="kpi-value">{{ k.despesaRealizada | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</strong>
+          <span class="kpi-sub">Previsto: {{ k.despesaPrevista | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>
+          <div class="kpi-bar">
+            <div class="kpi-bar-fill kpi-bar-red"
+                 [style.width.%]="k.despesaPrevista > 0 ? (k.despesaRealizada / k.despesaPrevista * 100) : 0"></div>
+          </div>
+        </div>
+
+        <div class="kpi-card" [class.kpi-saldo-pos]="k.saldoRealizado >= 0" [class.kpi-saldo-neg]="k.saldoRealizado < 0">
+          <span class="kpi-label">Saldo realizado</span>
+          <strong class="kpi-value" [style.color]="k.saldoRealizado >= 0 ? 'var(--color-success)' : 'var(--color-danger)'">
+            {{ k.saldoRealizado | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
+          </strong>
+          <span class="kpi-sub">Previsto: {{ k.saldoPrevisto | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>
+        </div>
+
+        <div class="kpi-card">
+          <span class="kpi-label">Ticket médio</span>
+          <strong class="kpi-value">{{ k.ticketMedio | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</strong>
+          <span class="kpi-sub">Por sessão realizada</span>
+        </div>
+
+        <div class="kpi-card">
+          <span class="kpi-label">Sessões realizadas</span>
+          <strong class="kpi-value">{{ k.totalSessoesRealizadas }}<small style="font-size:.65em;font-weight:400"> / {{ k.totalSessoesAgendadas }}</small></strong>
+          <span class="kpi-sub">Taxa: {{ k.taxaOcupacao }}%</span>
+          <div class="kpi-bar">
+            <div class="kpi-bar-fill kpi-bar-blue"
+                 [style.width.%]="k.totalSessoesAgendadas > 0 ? (k.totalSessoesRealizadas / k.totalSessoesAgendadas * 100) : 0"></div>
+          </div>
+        </div>
+
+        <div class="kpi-card" [class.kpi-alert]="k.taxaAbsenteismo > 20">
+          <span class="kpi-label">Taxa de absenteísmo</span>
+          <strong class="kpi-value" [style.color]="k.taxaAbsenteismo > 20 ? 'var(--color-danger)' : 'var(--color-text)'">
+            {{ k.taxaAbsenteismo }}%
+          </strong>
+          <span class="kpi-sub">{{ k.totalSessoesFalta + k.totalSessoesFaltaJustificada }} faltas no período</span>
+        </div>
+
+        <div class="kpi-card" [class.kpi-alert]="k.taxaInadimplencia > 10">
+          <span class="kpi-label">Taxa de inadimplência</span>
+          <strong class="kpi-value" [style.color]="k.taxaInadimplencia > 10 ? 'var(--color-danger)' : 'var(--color-text)'">
+            {{ k.taxaInadimplencia }}%
+          </strong>
+          <span class="kpi-sub">{{ k.pacientesInadimplentes.length }} pacientes em atraso</span>
+        </div>
+      </div>
+
+      <!-- ── Linha 2: Gráficos ── -->
+      <div class="grid-2-1" style="margin:24px 0;gap:20px;display:grid;grid-template-columns:2fr 1fr">
+
+        <!-- Fluxo de Caixa (multi-mês) -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="heading-sm">Fluxo de Caixa — últimos 6 meses</h3>
+          </div>
+          @if (fluxo().length > 0) {
+            <div class="chart-container" style="height:220px;padding:16px 0">
+              <div class="bar-chart">
+                @for (m of fluxo(); track m.competencia) {
+                  <div class="bar-group">
+                    <div class="bar-wrap">
+                      <div class="bar bar-receita"
+                           [style.height.px]="calcBarH(m.receitasConfirmado)"
+                           [title]="'Receita: ' + (m.receitasConfirmado | currency:'BRL':'symbol':'1.2-2':'pt-BR')"></div>
+                      <div class="bar bar-despesa"
+                           [style.height.px]="calcBarH(m.despesasConfirmado)"
+                           [title]="'Despesa: ' + (m.despesasConfirmado | currency:'BRL':'symbol':'1.2-2':'pt-BR')"></div>
+                    </div>
+                    <span class="bar-label">{{ m.competencia | slice:5 }}/{{ m.competencia | slice:2:4 }}</span>
+                  </div>
+                }
+              </div>
+              <div class="chart-legend">
+                <span class="legend-dot legend-receita"></span><span>Receita</span>
+                <span class="legend-dot legend-despesa" style="margin-left:16px"></span><span>Despesa</span>
+              </div>
             </div>
           } @else {
-            <div class="kpi-value">
-              <span class="display-lg">{{ kpi.value }}</span>
-            </div>
+            <p class="empty-state">Nenhum dado disponível</p>
           }
-          <div class="kpi-change" [class.kpi-change--positive]="kpi.change >= 0" [class.kpi-change--negative]="kpi.change < 0">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-              @if (kpi.change >= 0) {
-                <polyline points="18 15 12 9 6 15"/>
-              } @else {
-                <polyline points="6 9 12 15 18 9"/>
-              }
-            </svg>
-            <span class="label-text">{{ kpi.change > 0 ? '+' : '' }}{{ kpi.change }}%</span>
-            <span class="body-text kpi-change-label">{{ kpi.changeLabel }}</span>
-          </div>
-        </div>
-      }
-    </div>
-
-    <!-- MIDDLE ROW: Chart + Remaining -->
-    <div class="dash-mid">
-      <!-- Money Flow Chart -->
-      <div class="card animate-fade-up animate-delay-4">
-        <div class="chart-header">
-          <span class="heading-md">Fluxo de Caixa</span>
-          <div class="chart-legend">
-            <span class="legend-item"><span class="legend-dot legend-dot--receita"></span> Receita</span>
-            <span class="legend-item"><span class="legend-dot legend-dot--despesa"></span> Despesa</span>
-          </div>
-          <select class="input chart-period" style="width: auto; height: 30px; font-size: 12px;">
-            <option>Mensal</option>
-            <option>Semanal</option>
-          </select>
         </div>
 
-        <div class="chart-area">
-          @for (bar of barData(); track bar.month; let i = $index) {
-            <div class="chart-col" [class.chart-col--future]="bar.future">
-              <div class="chart-bars">
-                <div class="chart-bar chart-bar--receita animate-bar animate-bar-delay-{{ i + 1 }}"
-                     [style.height.%]="getBarHeight(bar.receita, maxBar())"
-                     [attr.aria-label]="'Receita ' + bar.month + ': R$ ' + bar.receita">
+        <!-- Sessões por status (donut) -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="heading-sm">Sessões por status</h3>
+          </div>
+          <div style="padding:16px">
+            @let total = k.totalSessoesAgendadas + k.totalSessoesCanceladas;
+            @if (total > 0) {
+              <div class="donut-chart">
+                <svg viewBox="0 0 120 120" width="120" height="120">
+                  <circle cx="60" cy="60" r="50" fill="none" stroke="var(--color-border)" stroke-width="20"/>
+                  <!-- Realizadas -->
+                  <circle cx="60" cy="60" r="50" fill="none"
+                          stroke="var(--color-success)"
+                          stroke-width="20"
+                          stroke-dasharray="{{ donutDash(k.totalSessoesRealizadas, total) }}"
+                          stroke-dashoffset="0"
+                          transform="rotate(-90 60 60)"/>
+                  <!-- Faltas -->
+                  <circle cx="60" cy="60" r="50" fill="none"
+                          stroke="var(--color-warning)"
+                          stroke-width="20"
+                          stroke-dasharray="{{ donutDash(k.totalSessoesFalta + k.totalSessoesFaltaJustificada, total) }}"
+                          [style.stroke-dashoffset]="donutOffset(k.totalSessoesRealizadas, total)"
+                          transform="rotate(-90 60 60)"/>
+                  <text x="60" y="64" text-anchor="middle" font-size="18" font-weight="700"
+                        fill="var(--color-text)">{{ k.totalSessoesRealizadas }}</text>
+                </svg>
+              </div>
+              <div style="margin-top:12px">
+                <div class="status-row">
+                  <span class="dot dot-green"></span>
+                  <span class="body-text">Realizadas</span>
+                  <span class="ml-auto body-text">{{ k.totalSessoesRealizadas }}</span>
                 </div>
-                <div class="chart-bar chart-bar--despesa animate-bar animate-bar-delay-{{ i + 1 }}"
-                     [style.height.%]="getBarHeight(bar.despesa, maxBar())">
+                <div class="status-row">
+                  <span class="dot dot-yellow"></span>
+                  <span class="body-text">Faltas</span>
+                  <span class="ml-auto body-text">{{ k.totalSessoesFalta + k.totalSessoesFaltaJustificada }}</span>
+                </div>
+                <div class="status-row">
+                  <span class="dot dot-gray"></span>
+                  <span class="body-text">Canceladas</span>
+                  <span class="ml-auto body-text">{{ k.totalSessoesCanceladas }}</span>
                 </div>
               </div>
-              <span class="chart-label caption-text">{{ bar.month }}</span>
-            </div>
+            } @else {
+              <p class="empty-state">Sem sessões no período</p>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Linha 3: Ranking + Inadimplentes ── -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px">
+
+        <!-- Ranking psicólogos -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="heading-sm">Ranking — psicólogos</h3>
+          </div>
+          @if (k.rankingPsicologos.length === 0) {
+            <p class="empty-state">Nenhum dado disponível</p>
+          } @else {
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Psicólogo</th>
+                  <th class="text-right">Sessões</th>
+                  <th class="text-right">Receita</th>
+                  <th class="text-right">Absent.</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (r of k.rankingPsicologos; track r.psicologoId; let i = $index) {
+                  <tr>
+                    <td>
+                      <span class="rank-badge" [class.gold]="i===0" [class.silver]="i===1" [class.bronze]="i===2">
+                        {{ i + 1 }}
+                      </span>
+                    </td>
+                    <td><strong>{{ r.nome }}</strong></td>
+                    <td class="text-right">{{ r.sessoesRealizadas }}<small class="text-muted">/{{ r.totalSessoes }}</small></td>
+                    <td class="text-right text-success">{{ r.receitaGerada | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</td>
+                    <td class="text-right" [style.color]="r.taxaAbsenteismo > 20 ? 'var(--color-danger)' : 'var(--color-text)'">
+                      {{ r.taxaAbsenteismo }}%
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </div>
+
+        <!-- Pacientes inadimplentes -->
+        <div class="card">
+          <div class="card-header" style="display:flex;justify-content:space-between;align-items:center">
+            <h3 class="heading-sm">Inadimplência</h3>
+            @if (k.pacientesInadimplentes.length > 0) {
+              <span class="badge badge-danger">{{ k.pacientesInadimplentes.length }} pacientes</span>
+            }
+          </div>
+          @if (k.pacientesInadimplentes.length === 0) {
+            <p class="empty-state" style="color:var(--color-success)">✓ Nenhum paciente inadimplente</p>
+          } @else {
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Paciente</th>
+                  <th class="text-right">Parcelas</th>
+                  <th class="text-right">Valor</th>
+                  <th>Mais antigo</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (p of k.pacientesInadimplentes; track p.pacienteId) {
+                  <tr>
+                    <td><strong>{{ p.nome }}</strong></td>
+                    <td class="text-right text-danger">{{ p.totalLancamentosVencidos }}</td>
+                    <td class="text-right text-danger">{{ p.valorTotal | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</td>
+                    <td style="color:var(--color-muted);font-size:12px">
+                      {{ p.vencimentoMaisAntigo | date:'dd/MM/yyyy' }}
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
           }
         </div>
       </div>
 
-      <!-- Remaining / Budget Card -->
-      <div class="card animate-fade-up animate-delay-5">
-        <div class="remaining-header">
-          <span class="heading-md">Meta Mensal</span>
-        </div>
-        <div class="remaining-value">
-          <span class="display-xl">69</span>
-          <span class="display-xl cents">%</span>
-        </div>
-        <p class="body-text remaining-desc" style="color: var(--color-muted);">
-          Faturamento atingiu 69% da meta mensal de R$ 30.000
-        </p>
-        <div class="remaining-bars">
-          <div class="remaining-item">
-            <div class="remaining-row">
-              <span class="heading-sm">Sessões</span>
-              <span class="label-text" style="color: var(--color-sage-400);">89%</span>
-            </div>
-            <div class="progress"><div class="progress__fill" style="width: 89%"></div></div>
+      <!-- ── Gráfico Absenteísmo por psicólogo ── -->
+      @if (k.rankingPsicologos.length > 0) {
+        <div class="card" style="margin-bottom:24px">
+          <div class="card-header">
+            <h3 class="heading-sm">Absenteísmo por psicólogo</h3>
           </div>
-          <div class="remaining-item">
-            <div class="remaining-row">
-              <span class="heading-sm">Recebimentos</span>
-              <span class="label-text" style="color: var(--color-sage-400);">78%</span>
-            </div>
-            <div class="progress"><div class="progress__fill" style="width: 78%"></div></div>
-          </div>
-          <div class="remaining-item">
-            <div class="remaining-row">
-              <span class="heading-sm">Inadimplência</span>
-              <span class="label-text" style="color: var(--color-warning);">42%</span>
-            </div>
-            <div class="progress"><div class="progress__fill" style="width: 42%; background: var(--color-warning);"></div></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- BOTTOM ROW: Recent Sessions Table -->
-    <div class="dash-bottom">
-      <div class="card animate-fade-up animate-delay-6">
-        <div class="table-header">
-          <span class="heading-md">Sessões Recentes</span>
-          <button class="btn btn--secondary btn--sm">Ver todas</button>
-        </div>
-        <table class="table">
-          <thead>
-            <tr>
-              <th class="caption-text">Paciente</th>
-              <th class="caption-text">Psicólogo(a)</th>
-              <th class="caption-text">Data</th>
-              <th class="caption-text">Valor</th>
-              <th class="caption-text">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (s of sessions(); track s.paciente + s.data) {
-              <tr>
-                <td class="heading-sm">{{ s.paciente }}</td>
-                <td class="body-text">{{ s.psicologo }}</td>
-                <td class="mono-text">{{ s.data }}</td>
-                <td class="heading-sm">R$ {{ s.valor.toFixed(2) }}</td>
-                <td>
-                  <span class="pill pill--{{ s.status }}">
-                    <span class="pill__dot"></span>
-                    {{ statusLabel(s.status) }}
-                  </span>
-                </td>
-              </tr>
+          <div style="padding:16px 0">
+            @for (r of k.rankingPsicologos; track r.psicologoId) {
+              <div class="absenteismo-row">
+                <span class="absenteismo-nome">{{ r.nome }}</span>
+                <div class="absenteismo-bar-wrap">
+                  <div class="absenteismo-bar"
+                       [style.width.%]="r.taxaAbsenteismo"
+                       [style.background]="r.taxaAbsenteismo > 20 ? 'var(--color-danger)' : r.taxaAbsenteismo > 10 ? 'var(--color-warning)' : 'var(--color-success)'">
+                  </div>
+                </div>
+                <span class="absenteismo-pct" [style.color]="r.taxaAbsenteismo > 20 ? 'var(--color-danger)' : 'var(--color-muted)'">
+                  {{ r.taxaAbsenteismo }}%
+                </span>
+              </div>
             }
-          </tbody>
-        </table>
-      </div>
-    </div>
+          </div>
+        </div>
+      }
+    }
   `,
   styles: [`
-    :host {
-      display: block;
-    }
-
-    // ---------- TOP ROW ----------
-    .dash-top {
+    .kpi-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 14px;
-      margin-bottom: 14px;
-    }
-
-    .kpi-label {
-      color: var(--color-muted);
-    }
-
-    .kpi-value {
-      margin-top: 8px;
-      color: var(--color-text);
-    }
-
-    .kpi-change {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      margin-top: 10px;
-
-      &--positive {
-        color: var(--color-sage-400);
-      }
-      &--negative {
-        color: var(--color-danger);
-      }
-    }
-
-    .kpi-change-label {
-      color: var(--color-muted);
-      margin-left: 4px;
-    }
-
-    // ---------- MIDDLE ROW ----------
-    .dash-mid {
-      display: grid;
-      grid-template-columns: 1fr 300px;
-      gap: 14px;
-      margin-bottom: 14px;
-    }
-
-    .chart-header {
-      display: flex;
-      align-items: center;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       gap: 16px;
-      margin-bottom: 16px;
-
-      .heading-md { flex: 1; color: var(--color-text); }
+      margin-bottom: 4px;
     }
 
-    .chart-legend {
-      display: flex;
-      gap: 14px;
-    }
-
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 11px;
-      color: var(--color-muted);
-    }
-
-    .legend-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-
-      &--receita { background: var(--color-primary-300); }
-      &--despesa { background: var(--color-primary-100); }
-    }
-
-    .chart-period {
-      padding: 4px 28px 4px 8px;
-    }
-
-    // Chart bars
-    .chart-area {
-      display: flex;
-      align-items: flex-end;
-      gap: 6px;
-      height: 200px;
-      padding-top: 10px;
-    }
-
-    .chart-col {
-      flex: 1;
+    .kpi-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 16px 18px;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      height: 100%;
+      gap: 4px;
+      transition: box-shadow 0.15s;
+      &:hover { box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+    }
+    .kpi-alert { border-color: var(--color-danger-light, #fecaca); }
 
-      &--future { opacity: 0.35; }
+    .kpi-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--color-muted); }
+    .kpi-value { font-size: 22px; font-weight: 700; color: var(--color-text); line-height: 1.2; }
+    .kpi-sub { font-size: 11px; color: var(--color-hint); }
+
+    .kpi-bar { height: 4px; background: var(--color-border); border-radius: 2px; margin-top: 6px; overflow: hidden; }
+    .kpi-bar-fill { height: 100%; border-radius: 2px; transition: width 0.4s ease; max-width: 100%; }
+    .kpi-bar-green { background: var(--color-success); }
+    .kpi-bar-red { background: var(--color-danger); }
+    .kpi-bar-blue { background: var(--color-primary-300); }
+
+    .periodo-tabs { display: flex; border: 1px solid var(--color-border); border-radius: var(--radius-md); overflow: hidden; }
+    .periodo-tab {
+      padding: 6px 14px; font-size: 12px; font-weight: 500; background: none;
+      border: none; cursor: pointer; color: var(--color-muted);
+      &:hover { background: var(--color-surface-2); }
+      &.active { background: var(--color-primary-50); color: var(--color-primary-300); font-weight: 600; }
     }
 
-    .chart-bars {
-      flex: 1;
-      display: flex;
-      align-items: flex-end;
-      gap: 3px;
-      width: 100%;
-    }
+    .bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 160px; padding: 0 8px; }
+    .bar-group { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+    .bar-wrap { display: flex; align-items: flex-end; gap: 3px; }
+    .bar { width: 14px; min-height: 2px; border-radius: 3px 3px 0 0; transition: height 0.4s ease; }
+    .bar-receita { background: var(--color-success); }
+    .bar-despesa { background: var(--color-danger); }
+    .bar-label { font-size: 10px; color: var(--color-hint); }
 
-    .chart-bar {
-      flex: 1;
-      border-radius: 4px 4px 0 0;
-      min-height: 4px;
-      transform-origin: bottom;
+    .chart-legend { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--color-muted); padding: 0 8px; margin-top: 4px; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+    .legend-receita { background: var(--color-success); }
+    .legend-despesa { background: var(--color-danger); }
 
-      &--receita { background: var(--color-primary-300); }
-      &--despesa { background: var(--color-primary-100); }
-    }
+    .donut-chart { display: flex; justify-content: center; }
 
-    .chart-label {
-      color: var(--color-hint);
-    }
+    .status-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--color-border); &:last-child { border-bottom: none; } }
+    .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .dot-green { background: var(--color-success); }
+    .dot-yellow { background: var(--color-warning); }
+    .dot-gray { background: var(--color-border-2); }
+    .ml-auto { margin-left: auto; }
 
-    // ---------- REMAINING / BUDGET ----------
-    .remaining-header {
-      margin-bottom: 8px;
-      .heading-md { color: var(--color-text); }
-    }
+    .rank-badge { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; font-size: 11px; font-weight: 700; background: var(--color-surface-2); color: var(--color-muted); }
+    .rank-badge.gold { background: #fef3c7; color: #d97706; }
+    .rank-badge.silver { background: #f1f5f9; color: #64748b; }
+    .rank-badge.bronze { background: #fef2e6; color: #c2721f; }
+    .text-muted { color: var(--color-muted); font-size: 11px; }
 
-    .remaining-value {
-      color: var(--color-text);
-      margin-bottom: 8px;
-    }
+    .absenteismo-row { display: flex; align-items: center; gap: 12px; padding: 8px 16px; }
+    .absenteismo-nome { width: 140px; font-size: 13px; font-weight: 500; color: var(--color-text); flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .absenteismo-bar-wrap { flex: 1; height: 8px; background: var(--color-border); border-radius: 4px; overflow: hidden; }
+    .absenteismo-bar { height: 100%; border-radius: 4px; transition: width 0.4s ease; max-width: 100%; }
+    .absenteismo-pct { width: 44px; text-align: right; font-size: 12px; font-weight: 600; }
 
-    .remaining-desc {
-      margin-bottom: 20px;
-    }
-
-    .remaining-bars {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .remaining-item {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-
-    .remaining-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    // ---------- BOTTOM ROW ----------
-    .dash-bottom {
-      margin-bottom: 24px;
-    }
-
-    .table-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 14px;
-
-      .heading-md { color: var(--color-text); }
-    }
-
-    .table {
-      width: 100%;
-      border-collapse: collapse;
-
-      th {
-        text-align: left;
-        padding: 8px 10px;
-        border-bottom: 1px solid var(--color-border);
-        color: var(--color-hint);
-      }
-
-      td {
-        padding: 10px;
-        border-bottom: 1px solid var(--color-border);
-        color: var(--color-text);
-      }
-
-      tbody tr {
-        transition: background 0.12s;
-
-        &:hover {
-          background: var(--color-surface-2);
-        }
-      }
-    }
-
-    // ---------- RESPONSIVE ----------
-    @media (max-width: 1280px) {
-      .dash-top {
-        grid-template-columns: 1fr 1fr;
-      }
-      .dash-mid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width: 768px) {
-      .dash-top {
-        grid-template-columns: 1fr;
-      }
-      .table {
-        font-size: 12px;
-      }
-    }
+    .badge-danger { background: #fee2e2; color: #dc2626; }
+    .loading-overlay { display: flex; justify-content: center; align-items: center; padding: 60px; }
+    .loading-spinner-lg { width: 32px; height: 32px; border: 3px solid var(--color-border); border-top-color: var(--color-primary-300); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
   `],
 })
 export class DashboardComponent implements OnInit {
-  readonly kpis = signal<KpiCard[]>([
-    { label: 'Faturamento Realizado', value: 18240.00, prefix: 'R$ ', suffix: '', change: 12.4, changeLabel: 'vs mês anterior', type: 'currency' },
-    { label: 'Sessões Realizadas', value: 142, prefix: '', suffix: '', change: 8, changeLabel: 'vs mês anterior', type: 'number' },
-    { label: 'Taxa de Inadimplência', value: 7.2, prefix: '', suffix: '%', change: -2.1, changeLabel: 'vs mês anterior', type: 'percent' },
-  ]);
+  private readonly api = inject(ApiService);
+  private readonly destroyRef = inject(DestroyRef);
 
-  readonly barData = signal<BarData[]>([
-    { month: 'Jan', receita: 14200, despesa: 8400, future: false },
-    { month: 'Fev', receita: 15800, despesa: 9200, future: false },
-    { month: 'Mar', receita: 13600, despesa: 7800, future: false },
-    { month: 'Abr', receita: 17200, despesa: 10400, future: false },
-    { month: 'Mai', receita: 16800, despesa: 9600, future: false },
-    { month: 'Jun', receita: 19200, despesa: 11200, future: false },
-    { month: 'Jul', receita: 18240, despesa: 10800, future: false },
-    { month: 'Ago', receita: 15000, despesa: 9000, future: true },
-    { month: 'Set', receita: 16000, despesa: 9500, future: true },
-    { month: 'Out', receita: 17000, despesa: 10000, future: true },
-    { month: 'Nov', receita: 18000, despesa: 10500, future: true },
-    { month: 'Dez', receita: 20000, despesa: 12000, future: true },
-  ]);
+  readonly kpis = signal<KpisDashboard | null>(null);
+  readonly fluxo = signal<FluxoMes[]>([]);
+  readonly loading = signal(false);
+  readonly periodo = signal<PeriodoFiltro>('mes');
 
-  readonly maxBar = signal(0);
+  readonly periodos: { value: PeriodoFiltro; label: string }[] = [
+    { value: 'mes', label: 'Mês' },
+    { value: 'trimestre', label: 'Trimestre' },
+    { value: 'semestre', label: 'Semestre' },
+    { value: 'ano', label: 'Ano' },
+  ];
 
-  readonly sessions = signal<RecentSession[]>([
-    { paciente: 'Ana Clara Silva', psicologo: 'Dra. Mariana Costa', data: '20/03/2026', valor: 180.00, status: 'realizada' },
-    { paciente: 'Bruno Oliveira', psicologo: 'Dr. Lucas Ferreira', data: '20/03/2026', valor: 200.00, status: 'agendada' },
-    { paciente: 'Carla Mendes', psicologo: 'Dra. Mariana Costa', data: '19/03/2026', valor: 180.00, status: 'realizada' },
-    { paciente: 'Diego Santos', psicologo: 'Dra. Juliana Lima', data: '19/03/2026', valor: 150.00, status: 'faltou' },
-    { paciente: 'Elena Rodrigues', psicologo: 'Dr. Lucas Ferreira', data: '18/03/2026', valor: 200.00, status: 'cancelada' },
-  ]);
+  competencia = signal(this.mesAtual());
+
+  private maxFluxo = 0;
 
   ngOnInit(): void {
-    const bars = this.barData();
-    const max = Math.max(...bars.map((b) => Math.max(b.receita, b.despesa)));
-    this.maxBar.set(max);
+    this.carregar();
   }
 
-  formatNumber(value: number): string {
-    const intPart = Math.floor(value);
-    return intPart.toLocaleString('pt-BR');
+  onCompetenciaChange(value: string): void {
+    this.competencia.set(value);
+    this.carregar();
   }
 
-  getCents(value: number): string {
-    const cents = Math.round((value % 1) * 100);
-    return cents.toString().padStart(2, '0');
+  setPeriodo(p: PeriodoFiltro): void {
+    this.periodo.set(p);
   }
 
-  getBarHeight(value: number, max: number): number {
-    if (max === 0) return 0;
-    return (value / max) * 100;
+  carregar(): void {
+    this.loading.set(true);
+    const comp = this.competencia();
+
+    this.api.get<KpisDashboard>('dashboard/kpis', { competencia: comp })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => { this.kpis.set(data); this.loading.set(false); },
+        error: () => this.loading.set(false),
+      });
+
+    // Fluxo 6 meses
+    const fim = comp;
+    const inicio = this.subtrairMeses(comp, 5);
+    this.api.get<FluxoMes[]>('dashboard/relatorios/fluxo-caixa', { inicio, fim })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          this.maxFluxo = Math.max(...data.flatMap(m => [m.receitasConfirmado, m.despesasConfirmado]), 1);
+          this.fluxo.set(data);
+        },
+        error: () => {},
+      });
   }
 
-  statusLabel(status: string): string {
-    const labels: Record<string, string> = {
-      realizada: 'Realizada',
-      agendada: 'Agendada',
-      faltou: 'Faltou',
-      cancelada: 'Cancelada',
-    };
-    return labels[status] || status;
+  calcBarH(valor: number): number {
+    return this.maxFluxo > 0 ? Math.round((valor / this.maxFluxo) * 140) : 2;
+  }
+
+  donutDash(parte: number, total: number): string {
+    const circ = 2 * Math.PI * 50;
+    const frac = total > 0 ? parte / total : 0;
+    return `${frac * circ} ${circ}`;
+  }
+
+  donutOffset(antes: number, total: number): string {
+    const circ = 2 * Math.PI * 50;
+    const frac = total > 0 ? antes / total : 0;
+    return `${-frac * circ}`;
+  }
+
+  private mesAtual(): string {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  }
+
+  private subtrairMeses(comp: string, meses: number): string {
+    const [ano, mes] = comp.split('-').map(Number);
+    const d = new Date(ano, mes - 1 - meses, 1);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
   }
 }
