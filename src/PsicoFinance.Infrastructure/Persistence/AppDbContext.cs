@@ -30,6 +30,7 @@ public class AppDbContext : DbContext, IAppDbContext
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
     public DbSet<Recibo> Recibos => Set<Recibo>();
     public DbSet<NotaFiscal> NotasFiscais => Set<NotaFiscal>();
+    public DbSet<RelatorioPersonalizado> RelatoriosPersonalizados => Set<RelatorioPersonalizado>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -55,6 +55,13 @@ export const routes: Routes = [
             (m) => m.DOCUMENTOS_ROUTES
           ),
       },
+      {
+        path: 'relatorios-bi',
+        loadChildren: () =>
+          import('./features/relatorios-bi/relatorios-bi.routes').then(
+            (m) => m.RELATORIOS_BI_ROUTES
+          ),
+      },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],
   },

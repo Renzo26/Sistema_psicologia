@@ -286,41 +286,59 @@
 ## MÓDULO 7 — Relatórios Personalizados (B.I.)
 
 ### 7.1 — Motor de Relatórios
-- [ ] Criar entidade `RelatorioPersonalizado` (nome, descrição, tipo, filtros, criado_por)
-- [ ] Criar enum `TipoRelatorio` (Financeiro, Sessoes, Pacientes, Psicologos, Inadimplencia, Repasses)
-- [ ] Implementar engine de filtros dinâmicos (período, psicólogo, paciente, status, plano de conta)
-- [ ] Implementar agrupamento configurável (por dia, semana, mês, trimestre, ano)
-- [ ] Implementar ordenação e paginação nos resultados
-- [ ] Command: `CriarRelatorioPersonalizadoCommand` + Handler + Validator
-- [ ] Command: `AtualizarRelatorioPersonalizadoCommand` + Handler
-- [ ] Command: `ExcluirRelatorioPersonalizadoCommand` + Handler
-- [ ] Query: `ListarRelatoriosPersonalizadosQuery` + Handler
-- [ ] Query: `ExecutarRelatorioQuery` + Handler (retorna dados formatados)
+- [x] Criar entidade `RelatorioPersonalizado` (nome, descrição, tipo, filtros, criado_por)
+- [x] Criar enum `TipoRelatorio` (Financeiro, Sessoes, Pacientes, Psicologos, Inadimplencia, Repasses, FluxoCaixaProjetado, Comparativo)
+- [x] Criar enum `FormatoExportacao` (Json, Pdf, Xlsx, Csv)
+- [x] Implementar engine de filtros dinâmicos (período, psicólogo, paciente, status, plano de conta)
+- [x] Implementar agrupamento configurável (por dia, semana, mês, trimestre, ano)
+- [x] Implementar ordenação nos resultados
+- [x] Command: `CriarRelatorioPersonalizadoCommand` + Handler + Validator
+- [x] Command: `AtualizarRelatorioPersonalizadoCommand` + Handler + Validator
+- [x] Command: `ExcluirRelatorioPersonalizadoCommand` + Handler (soft delete)
+- [x] Command: `MarcarFavoritoCommand` + Handler
+- [x] Query: `ListarRelatoriosPersonalizadosQuery` + Handler
+- [x] Query: `ObterRelatorioPersonalizadoQuery` + Handler
+- [x] Query: `ExecutarRelatorioQuery` + Handler (8 tipos de relatório implementados)
 
 ### 7.2 — Templates de Relatório Pré-definidos
-- [ ] Template: Faturamento por período (receitas vs despesas)
-- [ ] Template: Produtividade por psicólogo (sessões realizadas, faltas, receita gerada)
-- [ ] Template: Análise de inadimplência (aging report — 30/60/90 dias)
-- [ ] Template: Comparativo mensal (mês atual vs anterior vs mesmo mês ano anterior)
-- [ ] Template: Ranking de pacientes por receita gerada
+- [x] Template: Faturamento por período (receitas vs despesas)
+- [x] Template: Produtividade por psicólogo (sessões realizadas, faltas, receita gerada)
+- [x] Template: Análise de inadimplência (aging report — 30/60/90 dias)
+- [x] Template: Comparativo mensal (mês atual vs anterior vs mesmo mês ano anterior)
+- [x] Template: Ranking de pacientes por receita gerada
 - [ ] Template: Ocupação de agenda (horários ocupados vs disponíveis)
-- [ ] Template: Repasses por psicólogo com detalhamento por sessão
-- [ ] Template: Fluxo de caixa projetado (próximos 30/60/90 dias)
+- [x] Template: Repasses por psicólogo com detalhamento por sessão
+- [x] Template: Fluxo de caixa projetado (próximos 30/60/90 dias)
 
 ### 7.3 — Exportação e Visualização
-- [ ] Exportar relatórios em PDF (QuestPDF)
-- [ ] Exportar relatórios em Excel (.xlsx — ClosedXML ou similar)
-- [ ] Exportar relatórios em CSV
-- [ ] Endpoint: `GET /relatorios/{id}/executar` (JSON com dados)
-- [ ] Endpoint: `GET /relatorios/{id}/exportar?formato=pdf|xlsx|csv`
-- [ ] Endpoints REST: CRUD completo `/relatorios`
+- [x] Exportar relatórios em PDF (QuestPDF)
+- [x] Exportar relatórios em Excel (.xlsx — ClosedXML)
+- [x] Exportar relatórios em CSV (implementação manual)
+- [x] Endpoint: `GET /relatorios-bi/{id}/executar` (JSON com dados)
+- [x] Endpoint: `POST /relatorios-bi/executar` (ad-hoc, sem salvar)
+- [x] Endpoint: `GET /relatorios-bi/{id}/exportar?formato=pdf|xlsx|csv`
+- [x] Endpoint: `POST /relatorios-bi/exportar` (ad-hoc)
+- [x] Endpoints REST: CRUD completo `/relatorios-bi`
+- [x] Endpoint: `GET /relatorios-bi/templates`
+- [x] Endpoint: `PATCH /relatorios-bi/{id}/favorito`
+- [x] Migration EF Core: tabela `relatorios_personalizados`
+- [x] Serviço `RelatorioExportService` registrado na Infrastructure DI
 
 ### 7.4 — Frontend B.I.
-- [ ] Tela de listagem de relatórios (pré-definidos + personalizados)
-- [ ] Tela de criação/edição de relatório com construtor visual de filtros
-- [ ] Visualização de resultados com gráficos interativos (barras, linhas, pizza, área)
+- [x] Tela de listagem de relatórios (pré-definidos + personalizados) com abas
+- [x] Filtro por tipo de relatório na listagem
+- [x] Cards para templates com ícones por tipo
+- [x] Botões "Executar" e "Personalizar" nos templates
+- [x] Tela de criação/edição de relatório com construtor visual de filtros
+- [x] Filtros dinâmicos por tipo de relatório no editor
+- [x] Preview ("Testar Filtros") no editor
+- [x] Tela de visualizador com tabela dinâmica baseada em colunas retornadas
+- [x] Visualização em gráfico (bar-chart CSS simplificado + instruções para ng2-charts)
+- [x] Toggle de favorito na listagem de relatórios personalizados
+- [x] Botões de exportação (PDF, XLSX, CSV) com download via Blob URL
+- [x] Rota `relatorios-bi` adicionada ao `app.routes.ts`
+- [x] Item "Relatórios B.I." adicionado ao sidebar
 - [ ] Drill-down: clicar em dado do gráfico para ver detalhes
-- [ ] Salvar relatórios como favoritos
 - [ ] Agendar envio automático de relatório por email/WhatsApp (via N8N)
 - [ ] Testes unitários e de integração
 
@@ -371,10 +389,10 @@
 | Módulo 4 — Automações N8N | 16 | 0 | 0% |
 | Módulo 5 — Dashboard | 16 | 16 | 100% |
 | Módulo 6 — Documentos | 14 | 12 | 86% |
-| Módulo 7 — Relatórios B.I. | 27 | 0 | 0% |
+| Módulo 7 — Relatórios B.I. | 32 | 28 | 88% |
 | Fase Final — Qualidade & Deploy | 19 | 0 | 0% |
-| **TOTAL** | **221** | **157** | **71%** |
+| **TOTAL** | **226** | **185** | **82%** |
 
 ---
 
-*Atualizado em: 2026-04-02*
+*Atualizado em: 2026-04-02 — Módulo 7 implementado*

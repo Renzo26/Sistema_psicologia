@@ -1186,6 +1186,92 @@ namespace PsicoFinance.Infrastructure.Persistence.Migrations
                 {
                     b.Navigation("RefreshTokens");
                 });
+
+            modelBuilder.Entity("PsicoFinance.Domain.Entities.RelatorioPersonalizado", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("nome");
+
+                    b.Property<string>("Descricao")
+                        .HasColumnType("text")
+                        .HasColumnName("descricao");
+
+                    b.Property<int>("Tipo")
+                        .HasColumnType("integer")
+                        .HasColumnName("tipo");
+
+                    b.Property<string>("FiltrosJson")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasDefaultValue("{}")
+                        .HasColumnName("filtros_json");
+
+                    b.Property<string>("Agrupamento")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("agrupamento");
+
+                    b.Property<string>("Ordenacao")
+                        .HasMaxLength(4)
+                        .HasColumnType("character varying(4)")
+                        .HasColumnName("ordenacao");
+
+                    b.Property<bool>("Favorito")
+                        .HasDefaultValue(false)
+                        .HasColumnType("boolean")
+                        .HasColumnName("favorito");
+
+                    b.Property<Guid>("CriadoPorId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("criado_por_id");
+
+                    b.Property<Guid>("ClinicaId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("clinica_id");
+
+                    b.Property<DateTimeOffset>("CriadoEm")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("criado_em");
+
+                    b.Property<DateTimeOffset>("AtualizadoEm")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("atualizado_em");
+
+                    b.Property<DateTimeOffset?>("ExcluidoEm")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("excluido_em");
+
+                    b.HasKey("Id")
+                        .HasName("pk_relatorios_personalizados");
+
+                    b.HasIndex("ClinicaId")
+                        .HasDatabaseName("ix_relatorios_personalizados_clinica_id");
+
+                    b.HasIndex("Tipo")
+                        .HasDatabaseName("ix_relatorios_personalizados_tipo");
+
+                    b.ToTable("relatorios_personalizados");
+                });
+
+            modelBuilder.Entity("PsicoFinance.Domain.Entities.RelatorioPersonalizado", b =>
+                {
+                    b.HasOne("PsicoFinance.Domain.Entities.Clinica", "Clinica")
+                        .WithMany()
+                        .HasForeignKey("ClinicaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_relatorios_personalizados_clinicas_clinica_id");
+
+                    b.Navigation("Clinica");
+                });
 #pragma warning restore 612, 618
         }
     }

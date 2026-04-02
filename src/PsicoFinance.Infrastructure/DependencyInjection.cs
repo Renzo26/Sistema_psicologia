@@ -14,6 +14,7 @@ using PsicoFinance.Infrastructure.Services.Audit;
 using PsicoFinance.Infrastructure.Services.Auth;
 using PsicoFinance.Infrastructure.Services.Encryption;
 using PsicoFinance.Infrastructure.Services.Pdf;
+using PsicoFinance.Infrastructure.Services.RelatorioExport;
 using PsicoFinance.Infrastructure.Services.Storage;
 
 namespace PsicoFinance.Infrastructure;
@@ -82,6 +83,9 @@ public static class DependencyInjection
         // ── PDF & Storage ─────────────────────────────────────────
         services.AddSingleton<IPdfService, QuestPdfService>();
         services.AddSingleton<IFileStorageService, LocalFileStorageService>();
+
+        // ── Relatório Export (BI) ─────────────────────────────────
+        services.AddSingleton<IRelatorioExportService, RelatorioExportService>();
 
         // ── Hangfire ──────────────────────────────────────────────
         var connectionString = configuration.GetConnectionString("DefaultConnection")!;
