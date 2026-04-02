@@ -221,6 +221,61 @@ select.input {
     background: var(--color-danger);
     color: #FFFFFF;
   }
+
+  &--success {
+    background: var(--color-success-bg);
+    color: var(--color-success);
+  }
+
+  &--danger {
+    background: var(--color-danger-bg);
+    color: var(--color-danger);
+  }
+
+  &--neutral {
+    background: var(--color-surface-2);
+    color: var(--color-muted);
+  }
+
+  &--warning {
+    background: var(--color-warning-bg);
+    color: var(--color-warning);
+  }
+}
+
+// ---------- ALERTAS ----------
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 500;
+
+  &--success {
+    background: var(--color-success-bg);
+    color: var(--color-success);
+    border: 1px solid var(--color-success);
+  }
+
+  &--danger {
+    background: var(--color-danger-bg);
+    color: var(--color-danger);
+    border: 1px solid var(--color-danger);
+  }
+
+  &--warning {
+    background: var(--color-warning-bg);
+    color: var(--color-warning);
+    border: 1px solid var(--color-warning);
+  }
+
+  &--neutral {
+    background: var(--color-surface-2);
+    color: var(--color-muted);
+    border: 1px solid var(--color-border);
+  }
 }
 
 // ---------- BARRA DE PROGRESSO ----------

@@ -262,23 +262,23 @@
 ## MÓDULO 6 — Emissão de Documentos
 
 ### 6.1 — Recibos PDF
-- [ ] Instalar biblioteca de geração PDF (QuestPDF ou similar)
-- [ ] Template de recibo (dados clínica, paciente, sessão, valor, forma pgto)
-- [ ] Command: `EmitirReciboCommand` + Handler
-- [ ] Endpoint: `GET /recibos/{sessaoId}` (retorna PDF)
-- [ ] Armazenamento do PDF gerado (S3/local)
+- [x] Instalar biblioteca de geração PDF (QuestPDF ou similar)
+- [x] Template de recibo (dados clínica, paciente, sessão, valor, forma pgto)
+- [x] Command: `EmitirReciboCommand` + Handler
+- [x] Endpoint: `GET /recibos/{sessaoId}` (retorna PDF)
+- [x] Armazenamento do PDF gerado (S3/local)
 
 ### 6.2 — NFSe (Nota Fiscal de Serviço Eletrônica)
-- [ ] Pesquisar e configurar API de NFSe (prefeitura da cidade cadastrada)
-- [ ] Command: `EmitirNFSeCommand` + Handler
-- [ ] Criar entidade `NotaFiscal` (número, XML, status, link)
-- [ ] Endpoint: `POST /notas-fiscais`
-- [ ] Tela de emissão de recibos/notas no Angular
+- [x] Pesquisar e configurar API de NFSe (prefeitura da cidade cadastrada)
+- [x] Command: `EmitirNFSeCommand` + Handler
+- [x] Criar entidade `NotaFiscal` (número, XML, status, link)
+- [x] Endpoint: `POST /notas-fiscais`
+- [x] Tela de emissão de recibos/notas no Angular
 
 ### 6.3 — Relatórios para Envio
-- [ ] Gerar relatório mensal por psicólogo em PDF
+- [x] Gerar relatório mensal por psicólogo em PDF
 - [ ] Command: `EnviarRelatorioMensalCommand` → disparar webhook N8N (WhatsApp/email)
-- [ ] Tela de relatórios com histórico de envios no Angular
+- [x] Tela de relatórios com histórico de envios no Angular
 - [ ] Testes de geração de documentos
 
 ---
@@ -370,11 +370,11 @@
 | Módulo 3 — Financeiro | 26 | 26 | 100% |
 | Módulo 4 — Automações N8N | 16 | 0 | 0% |
 | Módulo 5 — Dashboard | 16 | 16 | 100% |
-| Módulo 6 — Documentos | 14 | 0 | 0% |
+| Módulo 6 — Documentos | 14 | 12 | 86% |
 | Módulo 7 — Relatórios B.I. | 27 | 0 | 0% |
 | Fase Final — Qualidade & Deploy | 19 | 0 | 0% |
-| **TOTAL** | **221** | **145** | **66%** |
+| **TOTAL** | **221** | **157** | **71%** |
 
 ---
 
-*Atualizado em: 2026-03-31*
+*Atualizado em: 2026-04-02*

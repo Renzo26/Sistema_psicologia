@@ -48,6 +48,13 @@ export const routes: Routes = [
             (m) => m.CONFIGURACOES_ROUTES
           ),
       },
+      {
+        path: 'documentos',
+        loadChildren: () =>
+          import('./features/documentos/documentos.routes').then(
+            (m) => m.DOCUMENTOS_ROUTES
+          ),
+      },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],
   },
